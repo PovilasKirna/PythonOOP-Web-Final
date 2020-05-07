@@ -8,15 +8,11 @@ class Sudoku:
 
         # N - number of columns/rows
         # K - number of missing digits
-        # SQRT_N - integer value of square root of N
 
         self.N = N
         self.K = K
-        self.SQRT_N = math.sqrt(N)
-        self.SQRT_N = int(self.SQRT_N)
         self.numberList = [1,2,3,4,5,6,7,8,9]
-        self.counter = 0
-
+        
         # create a desired size board
         self.Board = []
         self.Board.append([0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -80,7 +76,6 @@ class Sudoku:
                             if not value in square[0] + square[1] + square[2]:
                                 self.Board[row][col] = value
                                 if self.checkGrid():
-                                    self.counter += 1
                                     break
                                 else:
                                     if self.solveGrid(self.Board):
@@ -166,7 +161,6 @@ class Sudoku:
 
 
 
-# stuff to run always here such as class/def
 def main():
     sudoku = Sudoku(N, K)
     
