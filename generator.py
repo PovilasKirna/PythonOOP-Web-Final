@@ -36,7 +36,7 @@ class Sudoku:
         return True
 
 
-    # A backtracking/recursive function to check all possible combinations of numbers until a solution is found
+    # A backtracking function to check all possible combinations of numbers until a solution is found
     def solveGrid(self):
         # Find next empty cell
         for i in range(0, 81):
