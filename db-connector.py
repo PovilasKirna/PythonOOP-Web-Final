@@ -6,6 +6,11 @@ class DbConnector():
         self.credentials = self.getCredentials()
         self.connection = self.makeConnection()
         self.tableTitle = title
+        self.QueryDictionary = {
+            "Insert" : "INSERT INTO UserLoginData (Username, Passwd) VALUES (%s, %s)",
+            "ReturnAll" : "SELECT * FROM UserLoginData",
+            "Delete" : "DELETE FROM UserLoginData WHERE UserID = %s"
+        }
     
     def getCredentials(self):
         self.credentials = None
@@ -25,9 +30,9 @@ class DbConnector():
             )
         return self.connection
 
-    def runQuery(self, query):
+    def runQuery(self, query, *args, **kwargs):
         cursor = self.connection.cursor()
-        cursor.execute(query)
+        cursor.execute(query, *args, **kwargs)
         self.connection.commit()
         
     def returnQueryList(self, query):
@@ -36,24 +41,17 @@ class DbConnector():
         resultList = cursor.fetchall()
         return resultList
 
+
+#Create Login object
 Login = DbConnector("UserLoginData")
-#Login.runQuery("CREATE TABLE UserLog (UserID int NOT NULL AUTO_INCREMENT,Username varchar(255) NOT NULL,Passwd varchar(255),PRIMARY KEY (UserID));")
 
-LoginInsertQuery = "INSERT INTO UserLoginData (Username, Passwd) VALUES (%s, %s)"
+#Admin = ("Player 1", "password")
+#Login.runQuery(Login.QueryDictionary["Insert"], Admin)
 
-result = Login.returnQueryList("SELECT * FROM UserLoginData")
-for row in result:
+#Print all rows in UserLoginData 
+result = Login.returnQueryList(Login.QueryDictionary["ReturnAll"])
+
+for row in result:  
     print(row)
+
 Login.connection.close()
-
-
-
-
-# cursor = connection.cursor()
-# cursor.execute("SELECT * FROM UserLoginData")
-
-# # Loop through the results
-# for id, Username, Password in cursor:
-#     print(f'Id: {id}, Username: {Username}, Password: {Password}')
-
-# # Close the connection
