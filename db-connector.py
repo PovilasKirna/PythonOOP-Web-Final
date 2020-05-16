@@ -6,11 +6,6 @@ class DbConnector():
         self.credentials = self.getCredentials()
         self.connection = self.makeConnection()
         self.tableTitle = title
-        self.QueryDictionary = {
-            "Insert" : "INSERT INTO {} (Username, Passwd) VALUES (%s, %s)".format(self.tableTitle),
-            "ReturnAll" : "SELECT * FROM {}".format(self.tableTitle),
-            "Delete" : "DELETE FROM {} WHERE UserID = %s".format(self.tableTitle),
-        }
     
     def getCredentials(self):
         self.credentials = None
@@ -30,31 +25,36 @@ class DbConnector():
             )
         return self.connection
 
-    def runQuery(self, query, args):
+    def insertQuery(self, *args):
         cursor = self.connection.cursor()
-        cursor.execute(query, args)
+        cursor.execute("INSERT INTO {} (Username, Passwd) VALUES (%s, %s)".format(self.tableTitle), *args)
         self.connection.commit()
         
     def returnQueryList(self, query):
         cursor = self.connection.cursor()
-        result = cursor.execute(query)
+        result = cursor.execute(query.format(self.tableTitle))
         resultList = cursor.fetchall()
         return resultList
+    
+    def deleteQuery(self, *args):
+        cursor = self.connection.cursor()
+        result = cursor.execute("DELETE FROM {} WHERE UserID = %s".format(self.tableTitle), *args)
+        self.connection.commit()
 
 
 #Create Login object
 Login = DbConnector("UserLoginData")
 
-# Inserts a  created user
-# User = ("Player 1", "password")
-# Login.runQuery(Login.QueryDictionary["Insert"], User)
+# Inserts a created user
+#User = ("Player 2", "password")
+#Login.insertQuery(User)
 
-#Deletes a user by key
-UserID = (11,)
-Login.runQuery(Login.QueryDictionary["Delete"], UserID)
+#Deletes user by his ID
+#UserID = (12,)
+#Login.deleteQuery(UserID)
 
 #Print all rows in UserLoginData 
-result = Login.returnQueryList(Login.QueryDictionary["ReturnAll"])
+result = Login.returnQueryList("SELECT UserID FROM {}")
 
 for row in result:  
     print(row)
