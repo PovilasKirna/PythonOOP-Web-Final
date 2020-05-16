@@ -36,27 +36,30 @@ class DbConnector():
         resultList = cursor.fetchall()
         return resultList
     
+    def printList(self, resultList):
+        for row in resultList:  
+            print(row)
+    
     def deleteQuery(self, *args):
         cursor = self.connection.cursor()
         result = cursor.execute("DELETE FROM {} WHERE UserID = %s".format(self.tableTitle), *args)
         self.connection.commit()
 
 
-#Create Login object
-Login = DbConnector("UserLoginData")
+if __name__ == "__main__":
+    #Create Login object
+    Login = DbConnector("UserLoginData")
 
-# Inserts a created user
-#User = ("Player 2", "password")
-#Login.insertQuery(User)
+    #Inserts a created user
+    # User = ("Player 2", "password")
+    # Login.insertQuery(User)
 
-#Deletes user by his ID
-#UserID = (12,)
-#Login.deleteQuery(UserID)
+    #Deletes user by his ID
+    # UserID = (12,)
+    # Login.deleteQuery(UserID)
 
-#Print all rows in UserLoginData 
-result = Login.returnQueryList("SELECT UserID FROM {}")
+    #Print all rows in UserLoginData 
+    result = Login.returnQueryList("SELECT UserID FROM {}")
+    Login.printList(result)
 
-for row in result:  
-    print(row)
-
-Login.connection.close()
+    Login.connection.close()
