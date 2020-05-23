@@ -4,13 +4,8 @@ import pygame
 import time
 pygame.font.init()
 
-if __name__ == "__main__":
-    sudoku = generator.Sudoku(9, 43)
-    sudoku.fillGrid()
-    sudoku.removeKDigits()
-
-
 class Grid:
+    sudoku = generator.Sudoku(9, 43)
     board = sudoku.returnBoard()
 
     def __init__(self, rows, cols, width, height, win):
@@ -248,7 +243,6 @@ def format_time(secs):
     mat = " " + str(minute) + ":" + str(sec)
     return mat
 
-
 def main():
     win = pygame.display.set_mode((540,600))
     pygame.display.set_caption("Sudoku")
@@ -287,7 +281,7 @@ def main():
                     board.clear()
                     key = None
 
-                if event.key == pygame.K_SPACE:
+                if event.key == pygame.K_s:
                     board.solve_gui()
 
                 if event.key == pygame.K_RETURN:

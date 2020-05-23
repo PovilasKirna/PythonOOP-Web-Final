@@ -1,7 +1,7 @@
 import tkinter as tk
 from functools import partial
 import db_connector as dbc
-import MainMenu_GUI as mm
+import Main_GUI as mm
 
 
 class LoginPage(tk.Frame):
@@ -42,4 +42,4 @@ class LoginPage(tk.Frame):
         else: 
             loginButton = tk.Button(self, text="Login").grid(row=4, column=0)
         
-        loginButton = tk.Button(self, text="Cancel", command=quit).grid(row=4, column=1)
+        quitbutton = tk.Button(self, text="Cancel", command=quit).grid(row=4, column=1, sticky="w")

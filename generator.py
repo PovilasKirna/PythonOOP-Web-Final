@@ -24,6 +24,8 @@ class Sudoku:
         self.Board.append([0, 0, 0, 0, 0, 0, 0, 0, 0])
         self.Board.append([0, 0, 0, 0, 0, 0, 0, 0, 0])
         self.Board.append([0, 0, 0, 0, 0, 0, 0, 0, 0])
+        self.fillGrid()
+        self.removeKDigits()
 
 
     # A function to check if the board is full
@@ -158,17 +160,10 @@ class Sudoku:
 
     def returnBoard(self):
         return self.Board
-
-
-
-def main():
-    sudoku = Sudoku(N, K)
     
 
 if __name__ == "__main__":
     N = 9
     K = 43
     sudoku = Sudoku(N, K)
-    sudoku.fillGrid()
-    sudoku.removeKDigits()
     sudoku.printSudoku()

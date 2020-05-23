@@ -1,9 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
 import Login_GUI
+import GUI
+import threading
 
-LARGE_FONT= ("Verdana", 12)
-
+LARGE_FONT= ("Ubuntu", 12)
 
 class Window(tk.Tk):
 
@@ -66,12 +67,15 @@ class MainMenu(tk.Frame):
         tk.Frame.__init__(self, parent)
         controller.geometry("1280x720")#fix
         controller.title("Sudoku")#fix
-        label = tk.Label(self, text="Page One!!!", font=LARGE_FONT)
+        label = tk.Label(self, text="Main Menu", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
 
-        button1 = tk.Button(self, text="Back to Home", command=lambda: controller.show_frame("WarningPage"))
+        button1 = tk.Button(self, text="Start a New Game", command= lambda: threading.Thread(target=GUI.main).start())
         button1.pack()
-
+        button2 = tk.Button(self, text="Game Table")
+        button2.pack()
+        button3 = tk.Button(self, text="Quit", command=quit)
+        button3.pack()
 
 
 if __name__ == "__main__":
