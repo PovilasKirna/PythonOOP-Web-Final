@@ -2,9 +2,10 @@ import tkinter as tk
 from tkinter import ttk
 import Login_GUI
 import GUI
-import multiprocessing
+import threading
 
 LARGE_FONT= ("Ubuntu", 12)
+
 
 class Window(tk.Tk):
 
@@ -16,7 +17,7 @@ class Window(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
         
         self.frames = {}
-        for F in (MainMenu, WarningPage, Login_GUI.LoginPage):
+        for F in (MainMenu, WarningPage, GameTable, Login_GUI.LoginPage):
             frame = F(container, self)
             instanceName = type(frame).__name__
             self.frames[instanceName] = frame
@@ -27,7 +28,7 @@ class Window(tk.Tk):
             self.show_frame("WarningPage")#fix
         else: 
             self.show_frame("LoginPage")#fix
-
+        
     def GetFrames(self):
         return self.frames   
      
@@ -37,7 +38,6 @@ class Window(tk.Tk):
         if(frame) : result = True
         else : result = False
         return result
-        
  
     def show_frame(self, cont):        
         frame = self.frames[cont]
@@ -52,14 +52,23 @@ class WarningPage(tk.Frame):
         controller.title("Sudoku - Warning")#fix
         label = tk.Label(self, text="WARNING: This is a alpha software \n use at your own risk!", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
-        
         button1 = ttk.Button(self, text="Agree", command=lambda: controller.show_frame("LoginPage"))
         button1.pack()
-
         button2 = ttk.Button(self, text="Disagree", command=quit)
         button2.pack()
  
-        
+class GameTable(tk.Frame):
+    
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self,parent)       
+        controller.geometry("1280x720")#fix
+        controller.title("Sudoku - Games")#fix
+        label = tk.Label(self, text="Your Games", font=LARGE_FONT)
+        label.pack(pady=10,padx=10)
+        button1 = ttk.Button(self, text="Go back to menu", command=lambda: controller.show_frame("MainMenu"))
+        button1.pack()
+        button2 = ttk.Button(self, text="Quit", command=quit)
+        button2.pack()
         
 class MainMenu(tk.Frame):
 
@@ -69,15 +78,21 @@ class MainMenu(tk.Frame):
         controller.title("Sudoku")#fix
         label = tk.Label(self, text="Main Menu", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
-        sudoku = multiprocessing.Process(target=GUI.main)
-        button1 = tk.Button(self, text="Start a New Game", command= sudoku.start())
+        button1 = tk.Button(self, text="Start a New Game", command=lambda: self.startGame())
         button1.pack()
-        button2 = tk.Button(self, text="Game Table")
+        button2 = tk.Button(self, text="Game Table", command=lambda: controller.show_frame("GameTable"))
         button2.pack()
         button3 = tk.Button(self, text="Quit", command=quit)
         button3.pack()
+        
+    def startGame(self,parent):
+        parent.destroy()
+        GUI.main()
+        
+
 
 
 if __name__ == "__main__":
     app = Window()
     app.mainloop()
+    

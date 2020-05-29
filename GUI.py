@@ -277,6 +277,7 @@ def format_time(secs):
     return mat
 
 def main():
+    pygame.init()
     win = pygame.display.set_mode((540,600))
     pygame.display.set_caption("Sudoku")
     board = Grid(9, 9, 540, 540, win)
