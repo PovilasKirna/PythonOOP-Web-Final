@@ -1,4 +1,5 @@
 # GUI.py
+import threading
 import generator
 import pygame
 import time
@@ -189,6 +190,10 @@ class Cube:
     def set_temp(self, val):
         self.temp = val
 
+def exitprogram():
+    print("Saved")
+    pygame.quit()
+    quit()
 
 def find_empty(bo):
     for i in range(len(bo)):
@@ -221,20 +226,48 @@ def valid(bo, num, pos):
 
     return True
 
+def text_objects(text, font):
+    textSurface = font.render(text, 1, (0, 0 ,0))
+    return textSurface, textSurface.get_rect()
 
+def button(window, msg, font, x,y,w,h,ic,ac, action = None):
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+    
+    if x+w > mouse[0] > x and y+h > mouse[1] > y:
+        pygame.draw.rect(window, ac, (x, y, w, h))
+        if click[0] == 1 and action != None:
+            action()
+    else:
+        pygame.draw.rect(window, ic, (x, y, w, h))
+    textSurf, textRect = text_objects(msg, font)
+    textRect.center = ( (x+(w/2), y+(h/2)) )
+    window.blit(textSurf, textRect)
+    
 def redraw_window(win, board, time, strikes):
+    #Values
     win.fill((255,255,255))
-    # Draw time
     fnt = pygame.font.SysFont("comicsans", 40)
+    fnt_small = pygame.font.SysFont("comicsans", 24)
+    red = (186, 18 ,0)
+    btn = (157, 209, 241)
+    highlight_btn = (200, 224, 244)
+    
+    # Draw time
     text = fnt.render("Time: " + format_time(time), 1, (0,0,0))
     win.blit(text, (540 - 160, 560))
     # Draw Strikes
-    text = fnt.render("X " * strikes, 1, (255, 0, 0))
-    win.blit(text, (20, 560))
+    text = fnt.render((str(strikes) + "X"), 1, red)
+    if strikes != 0:
+        win.blit(text, (20, 560))
     # Draw grid and board
     board.draw()
+    # Draw butons
+    button(win, "Save & Quit", fnt_small, 270,550,100,40,btn,highlight_btn, exitprogram)
+    solve = threading.Thread(target=board.solve_gui)
+    button(win, "Solve", fnt_small, 150,550,100,40,btn,highlight_btn, solve.start)
 
-
+    
 def format_time(secs):
     sec = secs%60
     minute = secs//60
@@ -280,9 +313,9 @@ def main():
                 if event.key == pygame.K_BACKSPACE:
                     board.clear()
                     key = None
-
                 if event.key == pygame.K_s:
-                    board.solve_gui()
+                    solve = threading.Thread(target=board.solve_gui)
+                    solve.start()
 
                 if event.key == pygame.K_RETURN:
                     i, j = board.selected
@@ -296,6 +329,10 @@ def main():
 
                         if board.is_finished():
                             print("Game over")
+                        elif(strikes>5):
+                            print("Game over")
+                            pygame.quit()
+                            return
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()

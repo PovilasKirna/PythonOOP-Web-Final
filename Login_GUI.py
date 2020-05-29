@@ -16,13 +16,13 @@ class LoginPage(tk.Frame):
     def validateLogin(self, username, password):
         Username = username.get()
         Password = password.get()
-        print("Username: ", Username,
-              "\n",
-              "Password: ", Password)
         UserList = self.LoginManager.returnQueryList("SELECT Username, Passwd FROM {}")
         for it in UserList:
             if Username == it[0] and Password == it[1]:
+                print("Success")
+                self.controller.show_frame("MainMenu")
                 return True
+        print("Bad details")
         return False
 
     def createWidgets(self):
@@ -37,9 +37,6 @@ class LoginPage(tk.Frame):
         passwordEntry = tk.Entry(self, textvariable=password, show='*').grid(row=1, column=1)
         
         # login button
-        if(lambda: self.validateLogin(username, password)):
-            loginButton = tk.Button(self, text="Login", command=lambda: self.controller.show_frame("MainMenu")).grid(row=4, column=0)
-        else: 
-            loginButton = tk.Button(self, text="Login").grid(row=4, column=0)
+        loginButton = tk.Button(self, text="Login", command=lambda: self.validateLogin(username, password)).grid(row=4, column=0)
         
         quitbutton = tk.Button(self, text="Cancel", command=quit).grid(row=4, column=1, sticky="w")

@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import Login_GUI
 import GUI
-import threading
+import multiprocessing
 
 LARGE_FONT= ("Ubuntu", 12)
 
@@ -69,8 +69,8 @@ class MainMenu(tk.Frame):
         controller.title("Sudoku")#fix
         label = tk.Label(self, text="Main Menu", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
-
-        button1 = tk.Button(self, text="Start a New Game", command= lambda: threading.Thread(target=GUI.main).start())
+        sudoku = multiprocessing.Process(target=GUI.main)
+        button1 = tk.Button(self, text="Start a New Game", command= sudoku.start())
         button1.pack()
         button2 = tk.Button(self, text="Game Table")
         button2.pack()
