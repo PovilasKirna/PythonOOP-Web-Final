@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-import Login_GUI
+import LoginValidator
 import GUI
 import threading
 

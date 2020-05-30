@@ -1,55 +1,148 @@
 import pygame
 import GUI
+import pygameInput as pi
+import time
+from LoginValidator import Login
+from List import ListItem as li
+
+
+
+pygame.init()
+#Main variables
+display_width = 1280
+display_heigth = 720
+run = True
+
+#Colors
+white = (255, 255, 255)
+black = (0, 0, 0)
+red = (186, 18 ,0)
+btn = (157, 209, 241)
+highlight_btn = (200, 224, 244)
+
+#Fonts
+font = pygame.font.SysFont("robotoregularttf", 40)
+font_small = pygame.font.SysFont("robotoregularttf", 24)
 
 class Window():
-    def __init__(self):
-        pygame.init()
-        #Constants
-        self.display_width = 1280
-        self.display_heigth = 720
-        
-        #Colors
-        self.white = (255, 255, 255)
-        self.black = (0, 0, 0)
-        self.red = (186, 18 ,0)
-        self.btn = (157, 209, 241)
-        self.highlight_btn = (200, 224, 244)
-        
-        #Fonts
-        self.font = pygame.font.SysFont("comicsans", 40)
-        self.font_small = pygame.font.SysFont("comicsans", 24)        
-        
-        #Scenes
-        self.alert = True
-        
-        self.window = pygame.display.set_mode((self.display_width, self.display_heigth))
-        pygame.display.set_caption("Sudoku")
+
+    def __init__(self, displayWidth, displayHeigth, Caption):
+        self.window = pygame.display.set_mode((display_width, display_heigth))
+        pygame.display.set_caption(Caption)
         self.clock = pygame.time.Clock()
-        self.alertPage()
+        self.Username = True
+        self.Password = False
+        self.verificationError = False
+        #self.redrawWindow("Alert")
+        self.redrawWindow("Login")
         
-    def alertPage(self):
-        
-        while self.alert:
+    def redrawWindow(self, pageName):
+        while run:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    quit()
-            self.redrawAlert()
+                    self.quitWindow()
+            
+            if(pageName == "Alert"):
+                self.drawAlert()
+            elif (pageName == "Login"):
+                self.drawLogin()
+            elif (pageName == "GameTable"):
+                self.drawTable()
+            elif (pageName == "MainMenu"):
+                self.drawMenu()
+            
             pygame.display.update()
             self.clock.tick(60)
+    
+    def drawAlert(self):
+        self.window.fill(white)
+        self.text("WARNING: This is an Alpha program! Use at your own risk!", display_width/2, display_heigth/2)
+        self.button(self.window, "Agree", font, 150, 455, 300, 80, btn, highlight_btn, lambda: self.redrawWindow("Login"))
+        self.button(self.window, "Disagree", font, 825, 455, 300, 80, btn, highlight_btn, self.quitWindow)
+    
+    def drawLogin(self):
+        L = Login()
+        username = self.drawUsername()
+        password = self.drawPassword()
+        if L.validateLogin(username, password):
+            self.verificationError = False
+            self.redrawWindow("MainMenu")
+        else:
+            self.verificationError = True
+
+    def drawUsername(self):
+        Input = pi.TextInput()
+        while self.Username:
+            self.window.fill(white)
+
+            events = pygame.event.get()
+            for event in events:
+                if event.type == pygame.QUIT:
+                    exit()
+            if(Input.update(events) == 1):
+                self.submit()
+            self.window.blit(Input.get_surface(), (490, 341))
+
+            self.text("Username:", 497, 300)
+            if self.verificationError == True:
+                self.text("User details not found", 550, 600)
+            self.button(self.window, "Continue", font, 417, 510, 200, 60, btn, highlight_btn, self.submit)
+            self.button(self.window, "Cancel", font, 663, 510, 200, 60, btn, highlight_btn, self.quitWindow)
+            pygame.display.update()
+            self.clock.tick(60)
+        return Input.get_text()
             
-    def loginPage(self):
-        pygame.quit()
-        GUI.main()
+    def drawPassword(self):
+        Input = pi.TextInput()
+        while self.Password:
+            PW = Input.get_text()
+            PWLEN = len(PW)
             
-    def redrawAlert(self):
-        self.window.fill(self.white)
-        text = "WARNING: This is an Alpha program! Use at your own risk!"
-        TextSurf, TextRect = self.text_objects(text, self.font, self.black)
-        TextRect.center = ((self.display_width/2), (self.display_heigth/2))
+            self.window.fill(white)
+
+            events = pygame.event.get()
+            for event in events:
+                if event.type == pygame.QUIT:
+                    exit()
+            if(Input.update(events) == 1):
+                self.submit()
+            Input.convertToPassword()
+            self.window.blit(Input.get_surface(), (490, 341))
+        
+            self.text("Password:", 497, 300)
+            self.button(self.window, "Login", font, 417, 510, 200, 60, btn, highlight_btn, self.submit)
+            self.button(self.window, "Cancel", font, 663, 510, 200, 60, btn, highlight_btn, self.quitWindow)
+            pygame.display.update()
+            self.clock.tick(60)
+        return Input.convertToPassword()
+
+    def drawTable(self):
+        print(1)
+
+    def drawMenu(self):
+        self.window.fill(white)
+        self.text("Main Menu", 540, 115)
+        self.button(self.window, "New Game", font, 490, 202, 300, 60, btn, highlight_btn, self.startGame)
+        self.button(self.window, "Load Game", font, 490, 303, 300, 60, btn, highlight_btn)
+        self.button(self.window, "Quit", font, 490, 404, 300, 60, btn, highlight_btn, self.quitWindow)
+    
+    
+    #Widgets
+    def startGame(self):
+        print("Started")
+        
+    def submit(self):
+        if self.Username and not self.Password:
+            self.Username = False
+            self.Password = True
+        elif not self.Username and self.Password:
+            self.Username = True
+            self.Password = False
+    
+    def text(self, text, x, y):
+        TextSurf, TextRect = self.text_objects(text, font, black)
+        TextRect.center = ((x), (y))
         self.window.blit(TextSurf, TextRect)
-        self.button(self.window, "Agree", self.font, 150, 455, 300, 80, self.btn, self.highlight_btn, self.loginPage)
-        self.button(self.window, "Disagree", self.font, 825, 455, 300, 80, self.btn, self.highlight_btn, quit)
         
     def text_objects(self, text, font, color):
         textSurface = font.render(text, 1, color)
@@ -63,88 +156,18 @@ class Window():
             pygame.draw.rect(window, ac, (x, y, w, h))
             if click[0] == 1 and action != None:
                 action()
+                time.sleep(0.15)
         else:
             pygame.draw.rect(window, ic, (x, y, w, h))
-        textSurf, textRect = self.text_objects(msg, font, self.black)
+        textSurf, textRect = self.text_objects(msg, font, black)
         textRect.center = ( (x+(w/2), y+(h/2)) )
         window.blit(textSurf, textRect)
-    
-pygame.init()
-screen = pygame.display.set_mode((640, 480))
-COLOR_INACTIVE = pygame.Color('lightskyblue3')
-COLOR_ACTIVE = pygame.Color('dodgerblue2')
-FONT = pygame.font.SysFont("comicsans", 32)
-class InputBox:
 
-    def __init__(self, x, y, w, h, text=''):
-        self.rect = pygame.Rect(x, y, w, h)
-        self.color = COLOR_INACTIVE
-        self.text = text
-        self.txt_surface = FONT.render(text, True, self.color)
-        self.active = False
-
-    def handle_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            # If the user clicked on the input_box rect.
-            if self.rect.collidepoint(event.pos):
-                # Toggle the active variable.
-                self.active = not self.active
-            else:
-                self.active = False
-            # Change the current color of the input box.
-            self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
-        if event.type == pygame.KEYDOWN:
-            if self.active:
-                if event.key == pygame.K_RETURN:
-                    print(self.text)
-                    self.text = ''
-                elif event.key == pygame.K_BACKSPACE:
-                    self.text = self.text[:-1]
-                else:
-                    self.text += event.unicode
-                # Re-render the text.
-                self.txt_surface = FONT.render(self.text, True, self.color)
-
-    def update(self):
-        # Resize the box if the text is too long.
-        width = max(200, self.txt_surface.get_width()+10)
-        self.rect.w = width
-
-    def draw(self, screen):
-        # Blit the text.
-        screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
-        # Blit the rect.
-        pygame.draw.rect(screen, self.color, self.rect, 2)
-
-
-
-def main():
-    clock = pygame.time.Clock()
-    input_box1 = InputBox(100, 100, 140, 32)
-    input_box2 = InputBox(100, 300, 140, 32)
-    input_boxes = [input_box1, input_box2]
-    done = False
-
-    while not done:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                done = True
-            for box in input_boxes:
-                box.handle_event(event)
-
-        for box in input_boxes:
-            box.update()
-
-        screen.fill((30, 30, 30))
-        for box in input_boxes:
-            box.draw(screen)
-
-        pygame.display.update()
-        clock.tick(30)
-
+    def quitWindow(self):
+        pygame.quit()
+        quit()
 
 if __name__ == "__main__":
-    Window()
-    #main()
+    Window(display_width, display_heigth, "Sudoku")
     pygame.quit()
     quit()
