@@ -5,8 +5,10 @@ import pygame
 import time
 pygame.font.init()
 
+
+
 class Grid:
-    sudoku = generator.Sudoku(9, 43)
+    sudoku = generator.Sudoku(9, 43)#43
     board = sudoku.returnBoard()
 
     def __init__(self, rows, cols, width, height, win):
@@ -19,6 +21,7 @@ class Grid:
         self.update_model()
         self.selected = None
         self.win = win
+
 
     def update_model(self):
         self.model = [[self.cubes[i][j].value for j in range(self.cols)] for i in range(self.rows)]
@@ -190,11 +193,6 @@ class Cube:
     def set_temp(self, val):
         self.temp = val
 
-def exitprogram():
-    print("Saved")
-    pygame.quit()
-    quit()
-
 def find_empty(bo):
     for i in range(len(bo)):
         for j in range(len(bo[0])):
@@ -202,7 +200,6 @@ def find_empty(bo):
                 return (i, j)  # row, col
 
     return None
-
 
 def valid(bo, num, pos):
     # Check row
@@ -238,13 +235,14 @@ def button(window, msg, font, x,y,w,h,ic,ac, action = None):
         pygame.draw.rect(window, ac, (x, y, w, h))
         if click[0] == 1 and action != None:
             action()
+            time.sleep(0.15)
     else:
         pygame.draw.rect(window, ic, (x, y, w, h))
     textSurf, textRect = text_objects(msg, font)
     textRect.center = ( (x+(w/2), y+(h/2)) )
     window.blit(textSurf, textRect)
     
-def redraw_window(win, board, time, strikes):
+def redraw_window(win, board, time, strikes, start, *args):
     #Values
     win.fill((255,255,255))
     fnt = pygame.font.SysFont("comicsans", 40)
@@ -263,11 +261,10 @@ def redraw_window(win, board, time, strikes):
     # Draw grid and board
     board.draw()
     # Draw butons
-    button(win, "Save & Quit", fnt_small, 270,550,100,40,btn,highlight_btn, exitprogram)
+    button(win, "Save & Quit", fnt_small, 270,550,100,40,btn,highlight_btn, lambda: exitprogram(board, start, *args))
     solve = threading.Thread(target=board.solve_gui)
     button(win, "Solve", fnt_small, 150,550,100,40,btn,highlight_btn, solve.start)
 
-    
 def format_time(secs):
     sec = secs%60
     minute = secs//60
@@ -276,14 +273,39 @@ def format_time(secs):
     mat = " " + str(minute) + ":" + str(sec)
     return mat
 
-def main():
+def countEmptyCells(bo):
+    empty = 0
+    for i in range(len(bo)):
+        for j in range(len(bo[0])):
+            if bo[i][j] == 0:
+                empty+=1
+    return empty
+
+def exitprogram(board, start, *args):
+    playerID = args
+    name = "First sudoku"
+    currentTime = format_time(round(time.time()-start))
+    table = board.model
+    cellsLeft = countEmptyCells(table)
+    if cellsLeft == 0:
+        done = True
+    else:
+        done = False
+        
+    print("Id: ",playerID, "Name: ", name, "Time: ", currentTime, "Cells left: ", cellsLeft, "Done: ", done, "Board: ", table)
+    #upload to db
+    print("Saved in cloud")
+    pygame.quit()
+    quit()
+
+def main(start, *args):
     pygame.init()
+    clock = pygame.time.Clock()
     win = pygame.display.set_mode((540,600))
     pygame.display.set_caption("Sudoku")
     board = Grid(9, 9, 540, 540, win)
     key = None
     run = True
-    start = time.time()
     strikes = 0
     while run:
 
@@ -345,11 +367,17 @@ def main():
         if board.selected and key != None:
             board.sketch(key)
 
-        redraw_window(win, board, play_time, strikes)
+        redraw_window(win, board, play_time, strikes, start, *args)
+        clock.tick(60)
         pygame.display.update()
+        
+    return play_time
 
-
+def startgame(playerID):
+    start = time.time()
+    main(start, playerID)
 
 if __name__ == "__main__":
-    main()
+    start = time.time()
+    main(start)
     pygame.quit()

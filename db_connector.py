@@ -30,9 +30,9 @@ class DbConnector():
         cursor.execute("INSERT INTO {} (Username, Passwd) VALUES (%s, %s)".format(self.tableTitle), *args)
         self.connection.commit()
         
-    def returnQueryList(self, query):
+    def returnQueryList(self, query, *args):
         cursor = self.connection.cursor()
-        result = cursor.execute(query.format(self.tableTitle))
+        result = cursor.execute(query.format(self.tableTitle), *args)
         resultList = cursor.fetchall()
         return resultList
     

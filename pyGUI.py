@@ -4,7 +4,7 @@ import pygameInput as pi
 import time
 from LoginValidator import Login
 from List import ListItem as li
-
+import db_connector as dbc
 
 
 pygame.init()
@@ -30,8 +30,10 @@ class Window():
         self.window = pygame.display.set_mode((display_width, display_heigth))
         pygame.display.set_caption(Caption)
         self.clock = pygame.time.Clock()
+        self.playerID = None
         self.Username = True
         self.Password = False
+        self.username = ""
         self.verificationError = False
         #self.redrawWindow("Alert")
         self.redrawWindow("Login")
@@ -62,13 +64,16 @@ class Window():
     
     def drawLogin(self):
         L = Login()
-        username = self.drawUsername()
+        self.username = self.drawUsername()
         password = self.drawPassword()
-        if L.validateLogin(username, password):
+        if L.validateLogin(self.username, password):
             self.verificationError = False
+            dbAgent = dbc.DbConnector("UserLoginData")
+            self.playerID = dbAgent.returnQueryList("SELECT UserID FROM Sudoku.{} WHERE Username = %s", (self.username,))
+            print(self.playerID)
             self.redrawWindow("MainMenu")
         else:
-            self.verificationError = True
+            self.verificationError = True 
 
     def drawUsername(self):
         Input = pi.TextInput()
@@ -117,11 +122,13 @@ class Window():
         return Input.convertToPassword()
 
     def drawTable(self):
-        print(1)
+        print("Table")
 
     def drawMenu(self):
         self.window.fill(white)
-        self.text("Main Menu", 540, 115)
+        self.text("Main Menu", display_width/2, 115)
+        self.small_text(self.username, 1200, 25)
+        self.button(self.window, "Log Out", font_small, 1130, 45, 140, 35, btn, highlight_btn, lambda: self.redrawWindow("Login"))
         self.button(self.window, "New Game", font, 490, 202, 300, 60, btn, highlight_btn, self.startGame)
         self.button(self.window, "Load Game", font, 490, 303, 300, 60, btn, highlight_btn)
         self.button(self.window, "Quit", font, 490, 404, 300, 60, btn, highlight_btn, self.quitWindow)
@@ -129,7 +136,8 @@ class Window():
     
     #Widgets
     def startGame(self):
-        print("Started")
+        pygame.quit()
+        GUI.startgame(self.playerID)
         
     def submit(self):
         if self.Username and not self.Password:
@@ -141,6 +149,11 @@ class Window():
     
     def text(self, text, x, y):
         TextSurf, TextRect = self.text_objects(text, font, black)
+        TextRect.center = ((x), (y))
+        self.window.blit(TextSurf, TextRect)
+    
+    def small_text(self, text, x, y):
+        TextSurf, TextRect = self.text_objects(text, font_small, black)
         TextRect.center = ((x), (y))
         self.window.blit(TextSurf, TextRect)
         
