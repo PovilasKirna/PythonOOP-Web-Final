@@ -269,7 +269,7 @@ def quitProgram():
     pygame.quit()
     quit()
     
-def upload(name, currentTime, timeCompleted, cellsLeft, done, table, playerID):
+def upload(name, timeCompleted, currentTime, cellsLeft, done, table, playerID):
     dbAgent = dbc.DbConnector("Sudoku")
     dbAgent.saveSudoku((name, timeCompleted, currentTime, cellsLeft, done, table))
     result = dbAgent.returnQueryList("SELECT SudokuID FROM Sudoku.{} WHERE SudokuName = %s", (name,))
@@ -281,15 +281,31 @@ def upload(name, currentTime, timeCompleted, cellsLeft, done, table, playerID):
 def countEmptyCells(bo):
     empty = 0
     for i in range(len(bo)):
-            if bo[i] == '0':
+        for j in range(len(bo[0])):
+            if bo[i][j].value == 0:
                 empty+=1
     return empty
 
-def exitprogram(win, board, start, *args):
+def parseToString(bo):
+    stringTable ="["
+    for i in range(len(bo)):
+        for j in range(len(bo[0])):
+            if j == 0:
+                stringTable+='['
+            stringTable+=str(bo[i][j].value)
+            if j != 8:
+                stringTable+=", "
+            if j == 8 and i != 8:
+                stringTable+= "], "
+            elif j == 8 and i == 8:
+                stringTable+="]]"
+    return stringTable
+
+def exitprogram(win, currentTable, start, *args):
     playerID = args[0][0][0]
     currentTime = format_time(round(time.time()-start))
-    table = str(board.model)
-    cellsLeft = countEmptyCells(table)
+    cellsLeft = countEmptyCells(currentTable)
+    table = parseToString(currentTable)
     if cellsLeft == 0:
         done = True
         timeCompleted = currentTime
@@ -318,7 +334,7 @@ def exitprogram(win, board, start, *args):
                 save = False
         Input.update(events)
         name = Input.get_text()
-        win.blit(Input.get_surface(), (222, 201))
+        win.blit(Input.get_surface(), (225, 201))
         
         text(win, "Save & Quit", font_32, (540 - 540/2), 84)
         
@@ -353,7 +369,7 @@ def exitprogram(win, board, start, *args):
         
         pygame.display.update()
     
-def redraw_window(win, board, time, strikes, start, *args):
+def redraw_window(win, board, currentTable, time, strikes, start, *args):
     #Fonts
     pygame.font.init()
     font = pygame.font.SysFont("comicsans", 40)
@@ -373,7 +389,7 @@ def redraw_window(win, board, time, strikes, start, *args):
     # Draw grid and board
     board.draw()
     # Draw butons
-    button(win, "Save & Quit", font_small, 270,550,100,40,btn,highlight_btn, lambda: exitprogram(win, board, start, *args))
+    button(win, "Save & Quit", font_small, 270,550,100,40,btn,highlight_btn, lambda: exitprogram(win, currentTable, start, *args))
     solve = threading.Thread(target=board.solve_gui)
     button(win, "Solve", font_small, 150,550,100,40,btn,highlight_btn, solve.start)
 
@@ -394,6 +410,7 @@ def main(start, *args):
     key = None
     run = True
     strikes = 0
+    table =[[]]
     while run:
         play_time = round(time.time() - start)
         for event in pygame.event.get():
@@ -452,7 +469,8 @@ def main(start, *args):
 
         if board.selected and key != None:
             board.sketch(key)
-        redraw_window(win, board, play_time, strikes, start, *args)
+        currentTable = board.cubes
+        redraw_window(win, board, currentTable, play_time, strikes, start, *args)
         clock.tick(60)
         pygame.display.update()
         
