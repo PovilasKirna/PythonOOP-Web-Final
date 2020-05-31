@@ -50,7 +50,7 @@ class TextInput:
 
         if not os.path.isfile(font_family):
             font_family = pygame.font.match_font(font_family)
-
+        pygame.font.init()
         self.font_object = pygame.font.Font(font_family, font_size)
 
         # Text-surface will be created during the first update call:

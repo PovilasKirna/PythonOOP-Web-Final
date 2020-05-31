@@ -1,13 +1,28 @@
-# GUI.py
 import threading
 import generator
 import pygame
 import time
 import db_connector as dbc
 import pyGUI
+import pygameInput as pi
+
+#Colors
+white = (255, 255, 255)
+black = (0, 0, 0)
+red = (186, 18 ,0)
+delete_red = (241, 157, 157)
+play_green = (160, 241, 157)
+btn = (157, 209, 241)
+highlight_btn = (200, 224, 244)
+
+#Fonts
 pygame.font.init()
-
-
+font = pygame.font.SysFont("comicsans", 40)
+font_small = pygame.font.SysFont("comicsans", 24)
+font_40 = pygame.font.SysFont("robotoregularttf", 40)
+font_32 = pygame.font.SysFont("robotoregularttf", 32)
+font_24 = pygame.font.SysFont("robotoregularttf", 24)
+font_20 = pygame.font.SysFont("robotoregularttf", 20)
 
 class Grid:
     sudoku = generator.Sudoku(9, 43)#43
@@ -142,7 +157,6 @@ class Grid:
 
         return False
 
-
 class Cube:
     rows = 9
     cols = 9
@@ -225,9 +239,16 @@ def valid(bo, num, pos):
 
     return True
 
-def text_objects(text, font):
-    textSurface = font.render(text, 1, (0, 0 ,0))
+def text_objects(text, font, color):
+    pygame.font.init()
+    textSurface = font.render(text, 1, color)
     return textSurface, textSurface.get_rect()
+
+def text(win, text, font, x, y):
+    pygame.font.init()
+    TextSurf, TextRect = text_objects(text, font, black)
+    TextRect.center = ((x), (y))
+    win.blit(TextSurf, TextRect)
 
 def button(window, msg, font, x,y,w,h,ic,ac, action = None):
     mouse = pygame.mouse.get_pos()
@@ -240,55 +261,34 @@ def button(window, msg, font, x,y,w,h,ic,ac, action = None):
             time.sleep(0.15)
     else:
         pygame.draw.rect(window, ic, (x, y, w, h))
-    textSurf, textRect = text_objects(msg, font)
+    textSurf, textRect = text_objects(msg, font, black)
     textRect.center = ( (x+(w/2), y+(h/2)) )
     window.blit(textSurf, textRect)
     
-def redraw_window(win, board, time, strikes, start, *args):
-    #Values
-    win.fill((255,255,255))
-    fnt = pygame.font.SysFont("comicsans", 40)
-    fnt_small = pygame.font.SysFont("comicsans", 24)
-    red = (186, 18 ,0)
-    btn = (157, 209, 241)
-    highlight_btn = (200, 224, 244)
+def quitProgram():
+    pygame.quit()
+    quit()
     
-    # Draw time
-    text = fnt.render("Time: " + format_time(time), 1, (0,0,0))
-    win.blit(text, (540 - 160, 560))
-    # Draw Strikes
-    text = fnt.render((str(strikes) + "X"), 1, red)
-    if strikes != 0:
-        win.blit(text, (20, 560))
-    # Draw grid and board
-    board.draw()
-    # Draw butons
-    button(win, "Save & Quit", fnt_small, 270,550,100,40,btn,highlight_btn, lambda: exitprogram(board, start, *args))
-    solve = threading.Thread(target=board.solve_gui)
-    button(win, "Solve", fnt_small, 150,550,100,40,btn,highlight_btn, solve.start)
-
-def format_time(secs):
-    sec = secs%60
-    minute = secs//60
-    hour = minute//60
-
-    mat = " " + str(minute) + ":" + str(sec)
-    return mat
-
+def upload(name, currentTime, timeCompleted, cellsLeft, done, table, playerID):
+    dbAgent = dbc.DbConnector("Sudoku")
+    dbAgent.saveSudoku((name, timeCompleted, currentTime, cellsLeft, done, table))
+    result = dbAgent.returnQueryList("SELECT SudokuID FROM Sudoku.{} WHERE SudokuName = %s", (name,))
+    sudokuID = result[0][0]
+    dbAgent.connectSudokuPlayer((playerID, sudokuID))
+    print("Saved in DB")
+    quitProgram()
+    
 def countEmptyCells(bo):
     empty = 0
     for i in range(len(bo)):
-        for j in range(len(bo[0])):
-            if bo[i][j] == 0:
+            if bo[i] == '0':
                 empty+=1
     return empty
 
-def exitprogram(board, start, *args):
+def exitprogram(win, board, start, *args):
     playerID = args[0][0][0]
-    name = "5"
     currentTime = format_time(round(time.time()-start))
-    table = board.model
-    stringtable = str(table)
+    table = str(board.model)
     cellsLeft = countEmptyCells(table)
     if cellsLeft == 0:
         done = True
@@ -297,32 +297,105 @@ def exitprogram(board, start, *args):
         done = False
         timeCompleted = None
         
-    print("Id: ",playerID, "Name: ", name, "Time: ", currentTime, "Cells left: ", cellsLeft, "Done: ", done, "Board: ", table)
-    dbAgent = dbc.DbConnector("Sudoku")
-    dbAgent.saveSudoku((name, timeCompleted, currentTime, cellsLeft, done, stringtable))#stringtable
-    print("saved sudoku")
-    result = dbAgent.returnQueryList("SELECT SudokuID FROM Sudoku.{} WHERE SudokuName = %s", (name,))
-    sudokuID = result[0][0]
-    print("got its ID", playerID, sudokuID)
-    dbAgent.connectSudokuPlayer((playerID, sudokuID))
-    print("Saved in cloud")
-    pygame.quit()
+    print("Id: ", playerID, "Curent time:", currentTime, "Completed time:", timeCompleted, "Cells left:", cellsLeft, "Done:", done, "Table:", table)
+    clock = pygame.time.Clock()
+    
+    pygame.font.init()
+    font = pygame.font.SysFont("comicsans", 40)
+    font_small = pygame.font.SysFont("comicsans", 24)
+    font_40 = pygame.font.SysFont("robotoregularttf", 40)
+    font_32 = pygame.font.SysFont("robotoregularttf", 32)
+    font_24 = pygame.font.SysFont("robotoregularttf", 24)
+    font_20 = pygame.font.SysFont("robotoregularttf", 20)
+    
+    Input = pi.TextInput(font_size=24)
+    save=True
+    while save:
+        win.fill(white)
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.QUIT:
+                save = False
+        Input.update(events)
+        name = Input.get_text()
+        win.blit(Input.get_surface(), (222, 201))
+        
+        text(win, "Save & Quit", font_32, (540 - 540/2), 84)
+        
+        text(win, "Name:", font_24, 186, 215)
+        button(win,"", font, 222, 230, 277, 1, black, black)#acts like a line
+        
+        text(win, "Time:", font_24, 191, 250)
+        text(win, currentTime, font_24, 247, 250)
+        button(win,"", font, 222, 265, 277, 1, black, black)#acts like a line
+        
+        text(win, "Empty cells left:", font_24, 135, 285)
+        if cellsLeft <= 9:
+            text(win, str(cellsLeft), font_24, 232, 285)
+        else:
+            text(win, str(cellsLeft), font_24, 238, 285)
+        button(win,"", font, 222, 300, 277, 1, black, black)#acts like a line
+        
+        text(win, "Cells completed:", font_24, 130, 320)
+        cellsCompleted = 81 - cellsLeft
+        text(win, (str(cellsCompleted)+"/81"), font_24, 254, 320)
+        button(win,"", font, 222, 335, 277, 1, black, black)#acts like a line
+        
+        text(win, "Completed:", font_24, 157, 355)
+        if done:
+            text(win, "Yes", font_24, 244, 355)
+        else:
+            text(win, "No", font_24, 241, 355)
+        button(win,"", font, 222, 370, 277, 1, black, black)#acts like a line
+        
+        button(win, "Save", font_20, 195, 484, 150, 30, btn, highlight_btn, lambda: upload(name, timeCompleted, currentTime, cellsLeft, done, table, playerID))
+        button(win, "Cancel", font_20, 195, 519, 150, 30, btn, highlight_btn, quitProgram)
+        
+        pygame.display.update()
+    
+def redraw_window(win, board, time, strikes, start, *args):
+    #Fonts
+    pygame.font.init()
+    font = pygame.font.SysFont("comicsans", 40)
+    font_small = pygame.font.SysFont("comicsans", 24)
+    font_40 = pygame.font.SysFont("robotoregularttf", 40)
+    font_32 = pygame.font.SysFont("robotoregularttf", 32)
+    font_24 = pygame.font.SysFont("robotoregularttf", 24)
+    font_20 = pygame.font.SysFont("robotoregularttf", 20)
+    win.fill(white)
+    # Draw time
+    txt = font.render("Time: " + format_time(time), 1, black)
+    win.blit(txt, (540 - 160, 560))
+    # Draw Strikes
+    txt = font.render((str(strikes) + "X"), 1, red)
+    if strikes != 0:
+        win.blit(txt, (20, 560))
+    # Draw grid and board
+    board.draw()
+    # Draw butons
+    button(win, "Save & Quit", font_small, 270,550,100,40,btn,highlight_btn, lambda: exitprogram(win, board, start, *args))
+    solve = threading.Thread(target=board.solve_gui)
+    button(win, "Solve", font_small, 150,550,100,40,btn,highlight_btn, solve.start)
 
-#    pyGUI.Window(1280, 720, "Sudoku", )
+def format_time(secs):
+    sec = secs%60
+    minute = secs//60
+    hour = minute//60
 
+    mat = " " + str(minute) + ":" + str(sec)
+    return mat
+    
 def main(start, *args):
     pygame.init()
-    clock = pygame.time.Clock()
     win = pygame.display.set_mode((540,600))
+    clock = pygame.time.Clock()
     pygame.display.set_caption("Sudoku")
     board = Grid(9, 9, 540, 540, win)
     key = None
     run = True
     strikes = 0
     while run:
-
         play_time = round(time.time() - start)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -366,6 +439,7 @@ def main(start, *args):
                             print("Game over")
                         elif(strikes>5):
                             print("Game over")
+                            run = False
                             pygame.quit()
                             return
 
@@ -378,7 +452,6 @@ def main(start, *args):
 
         if board.selected and key != None:
             board.sketch(key)
-
         redraw_window(win, board, play_time, strikes, start, *args)
         clock.tick(60)
         pygame.display.update()

@@ -23,8 +23,10 @@ btn = (157, 209, 241)
 highlight_btn = (200, 224, 244)
 
 #Fonts
+pygame.font.init()
 font = pygame.font.SysFont("robotoregularttf", 40)
 font_small = pygame.font.SysFont("robotoregularttf", 24)
+
 
 class Window():
 
@@ -76,7 +78,6 @@ class Window():
             self.verificationError = False
             dbAgent = dbc.DbConnector("UserLoginData")
             self.playerID = dbAgent.returnQueryList("SELECT UserID FROM Sudoku.{} WHERE Username = %s", (self.username,))
-            print(self.playerID)
             self.redrawWindow("MainMenu")
         else:
             self.verificationError = True 
@@ -89,7 +90,8 @@ class Window():
             events = pygame.event.get()
             for event in events:
                 if event.type == pygame.QUIT:
-                    exit()
+                    pygame.quit()
+                    quit()
             if(Input.update(events) == 1):
                 self.submit()
             self.window.blit(Input.get_surface(), (490, 341))
@@ -174,8 +176,8 @@ class Window():
         self.text("Load Game", display_width/2, 115)
         self.small_text(self.username, 1200, 25)
         self.button(self.window, "Log Out", font_small, 1130, 45, 140, 35, btn, highlight_btn, lambda: self.redrawWindow("Login"))
+        self.button(self.window, "Back", font_small, 15, 10, 140, 35, btn, highlight_btn, lambda: self.redrawWindow("MainMenu"))
         
-
     def drawMenu(self):
         self.window.fill(white)
         self.text("Main Menu", display_width/2, 115)
@@ -184,8 +186,6 @@ class Window():
         self.button(self.window, "New Game", font, 490, 202, 300, 60, btn, highlight_btn, self.startGame)
         self.button(self.window, "Load Game", font, 490, 303, 300, 60, btn, highlight_btn, lambda: self.redrawWindow("LoadGame"))
         self.button(self.window, "Quit", font, 490, 404, 300, 60, btn, highlight_btn, self.quitWindow)
-    
-    
     #Widgets
     def startGame(self):
         pygame.quit()
@@ -221,7 +221,7 @@ class Window():
         TextSurf, TextRect = self.text_objects(text, font_small, black)
         TextRect.center = ((x), (y))
         self.window.blit(TextSurf, TextRect)
-        
+
     def text_objects(self, text, font, color):
         textSurface = font.render(text, 1, color)
         return textSurface, textSurface.get_rect()
