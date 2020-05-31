@@ -12,7 +12,7 @@ class Login(tk.Frame):
         UserList = self.LoginManager.returnQueryList("SELECT Username, Passwd FROM {}")
         for it in UserList:
             if username == it[0] and password == it[1]:
-                print("Success")
+                print("Successfully validated")
                 return True
         print("Bad details")
         return False

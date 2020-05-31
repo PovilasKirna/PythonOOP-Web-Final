@@ -17,6 +17,8 @@ run = True
 white = (255, 255, 255)
 black = (0, 0, 0)
 red = (186, 18 ,0)
+delete_red = (241, 157, 157)
+play_green = (160, 241, 157)
 btn = (157, 209, 241)
 highlight_btn = (200, 224, 244)
 
@@ -35,12 +37,14 @@ class Window():
         self.Password = False
         self.username = ""
         self.verificationError = False
+        self.createdAccount = 0
         #self.redrawWindow("Alert")
         self.redrawWindow("Login")
         
     def redrawWindow(self, pageName):
         while run:
-            for event in pygame.event.get():
+            events = pygame.event.get()
+            for event in events:
                 if event.type == pygame.QUIT:
                     self.quitWindow()
             
@@ -48,10 +52,12 @@ class Window():
                 self.drawAlert()
             elif (pageName == "Login"):
                 self.drawLogin()
-            elif (pageName == "GameTable"):
+            elif (pageName == "LoadGame"):
                 self.drawTable()
             elif (pageName == "MainMenu"):
                 self.drawMenu()
+            elif (pageName == "CreateAccount"):
+                self.drawCreateUsername()
             
             pygame.display.update()
             self.clock.tick(60)
@@ -90,19 +96,41 @@ class Window():
 
             self.text("Username:", 497, 300)
             if self.verificationError == True:
-                self.text("User details not found", 550, 600)
+                self.text("User details not found", display_width/2, 680)
+            elif self.createdAccount == 1:
+                self.text("User created succesfully", display_width/2, 680)
+            elif self.createdAccount == -1:
+                self.text("Failed to create user", display_width/2, 680)
             self.button(self.window, "Continue", font, 417, 510, 200, 60, btn, highlight_btn, self.submit)
             self.button(self.window, "Cancel", font, 663, 510, 200, 60, btn, highlight_btn, self.quitWindow)
+            self.button(self.window, "Don't have an account? Create one", font_small, 417, 590, 446, 60, btn, highlight_btn, self.createAccount)
             pygame.display.update()
             self.clock.tick(60)
         return Input.get_text()
             
+    def drawCreateUsername(self):
+        Input = pi.TextInput()
+        while self.Username:
+            self.window.fill(white)
+
+            events = pygame.event.get()
+            for event in events:
+                if event.type == pygame.QUIT:
+                    exit()
+            if(Input.update(events) == 1):
+                self.submit()
+            self.window.blit(Input.get_surface(), (490, 341))
+
+            self.text("Create Username:", display_width/2, 300)
+            self.button(self.window, "Continue", font, 417, 510, 200, 60, btn, highlight_btn, self.submit)
+            self.button(self.window, "Cancel", font, 663, 510, 200, 60, btn, highlight_btn, lambda: self.redrawWindow("Login"))
+            pygame.display.update()
+            self.clock.tick(60)
+        return Input.get_text()
+    
     def drawPassword(self):
         Input = pi.TextInput()
         while self.Password:
-            PW = Input.get_text()
-            PWLEN = len(PW)
-            
             self.window.fill(white)
 
             events = pygame.event.get()
@@ -121,8 +149,32 @@ class Window():
             self.clock.tick(60)
         return Input.convertToPassword()
 
+    def drawCreatePassword(self):
+        Input = pi.TextInput()
+        while self.Password:
+            self.window.fill(white)
+
+            events = pygame.event.get()
+            for event in events:
+                if event.type == pygame.QUIT:
+                    exit()
+            if(Input.update(events) == 1):
+                self.submit()
+            self.window.blit(Input.get_surface(), (490, 341))
+        
+            self.text("Create Password:", display_width/2, 300)
+            self.button(self.window, "Create", font, 417, 510, 200, 60, btn, highlight_btn, self.submit)
+            self.button(self.window, "Cancel", font, 663, 510, 200, 60, btn, highlight_btn, lambda: self.redrawWindow("Login"))
+            pygame.display.update()
+            self.clock.tick(60)
+        return Input.get_text()
+
     def drawTable(self):
-        print("Table")
+        self.window.fill(white)
+        self.text("Load Game", display_width/2, 115)
+        self.small_text(self.username, 1200, 25)
+        self.button(self.window, "Log Out", font_small, 1130, 45, 140, 35, btn, highlight_btn, lambda: self.redrawWindow("Login"))
+        
 
     def drawMenu(self):
         self.window.fill(white)
@@ -130,7 +182,7 @@ class Window():
         self.small_text(self.username, 1200, 25)
         self.button(self.window, "Log Out", font_small, 1130, 45, 140, 35, btn, highlight_btn, lambda: self.redrawWindow("Login"))
         self.button(self.window, "New Game", font, 490, 202, 300, 60, btn, highlight_btn, self.startGame)
-        self.button(self.window, "Load Game", font, 490, 303, 300, 60, btn, highlight_btn)
+        self.button(self.window, "Load Game", font, 490, 303, 300, 60, btn, highlight_btn, lambda: self.redrawWindow("LoadGame"))
         self.button(self.window, "Quit", font, 490, 404, 300, 60, btn, highlight_btn, self.quitWindow)
     
     
@@ -146,6 +198,19 @@ class Window():
         elif not self.Username and self.Password:
             self.Username = True
             self.Password = False
+    
+    def createAccount(self):
+        dbAgent = dbc.DbConnector("UserLoginData")
+        L = Login()
+        create_username = self.drawCreateUsername()
+        create_password = self.drawCreatePassword()
+        dbAgent.insertQuery((create_username, create_password))
+        if L.validateLogin(create_username, create_password):
+            self.createdAccount = 1
+            self.redrawWindow("Login")
+        else:
+            self.createdAccount = -1
+            self.redrawWindow("CreateAccount")
     
     def text(self, text, x, y):
         TextSurf, TextRect = self.text_objects(text, font, black)

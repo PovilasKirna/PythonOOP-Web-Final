@@ -29,6 +29,7 @@ class DbConnector():
         cursor = self.connection.cursor()
         cursor.execute("INSERT INTO {} (Username, Passwd) VALUES (%s, %s)".format(self.tableTitle), *args)
         self.connection.commit()
+            
         
     def returnQueryList(self, query, *args):
         cursor = self.connection.cursor()
