@@ -28,14 +28,14 @@ font_small = pygame.font.SysFont("robotoregularttf", 24)
 
 class Window():
 
-    def __init__(self, displayWidth, displayHeigth, Caption):
+    def __init__(self, displayWidth, displayHeigth, Caption, *args):
         self.window = pygame.display.set_mode((display_width, display_heigth))
         pygame.display.set_caption(Caption)
         self.clock = pygame.time.Clock()
         self.playerID = None
         self.Username = True
         self.Password = False
-        self.username = ""
+        self.username = args
         self.verificationError = False
         self.createdAccount = 0
         #self.redrawWindow("Alert")

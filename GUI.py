@@ -3,6 +3,8 @@ import threading
 import generator
 import pygame
 import time
+import db_connector as dbc
+import pyGUI
 pygame.font.init()
 
 
@@ -282,21 +284,31 @@ def countEmptyCells(bo):
     return empty
 
 def exitprogram(board, start, *args):
-    playerID = args
-    name = "First sudoku"
+    playerID = args[0][0][0]
+    name = "5"
     currentTime = format_time(round(time.time()-start))
     table = board.model
+    stringtable = str(table)
     cellsLeft = countEmptyCells(table)
     if cellsLeft == 0:
         done = True
+        timeCompleted = currentTime
     else:
         done = False
+        timeCompleted = None
         
     print("Id: ",playerID, "Name: ", name, "Time: ", currentTime, "Cells left: ", cellsLeft, "Done: ", done, "Board: ", table)
-    #upload to db
+    dbAgent = dbc.DbConnector("Sudoku")
+    dbAgent.saveSudoku((name, timeCompleted, currentTime, cellsLeft, done, stringtable))#stringtable
+    print("saved sudoku")
+    result = dbAgent.returnQueryList("SELECT SudokuID FROM Sudoku.{} WHERE SudokuName = %s", (name,))
+    sudokuID = result[0][0]
+    print("got its ID", playerID, sudokuID)
+    dbAgent.connectSudokuPlayer((playerID, sudokuID))
     print("Saved in cloud")
     pygame.quit()
-    quit()
+
+#    pyGUI.Window(1280, 720, "Sudoku", )
 
 def main(start, *args):
     pygame.init()

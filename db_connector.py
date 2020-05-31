@@ -46,7 +46,16 @@ class DbConnector():
         result = cursor.execute("DELETE FROM {} WHERE UserID = %s".format(self.tableTitle), *args)
         self.connection.commit()
 
-
+    def saveSudoku(self, *args):
+        cursor = self.connection.cursor()
+        cursor.execute("INSERT INTO Sudoku.{} (SudokuName, TimeCompleted, TimeCurrent, CellsLeft, Done, Board) VALUES (%s, %s, %s, %s, %s, %s)".format(self.tableTitle), *args)
+        self.connection.commit()
+    
+    def connectSudokuPlayer(self, *args):
+        cursor = self.connection.cursor()
+        cursor.execute("INSERT INTO Sudoku.UserData (UserID, SudokuID) VALUES (%s, %s)", *args)
+        self.connection.commit()
+        
 if __name__ == "__main__":
     #Create Login object
     Login = DbConnector("UserLoginData")
