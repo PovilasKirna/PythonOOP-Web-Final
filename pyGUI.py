@@ -109,8 +109,11 @@ class Row():
         GUI.loadGame(args[0][0][0],args[1][4], args[1][0], args[1][1], args[1][5])
         
     def deleteRow(self, *args):
-        dbAgent = dbc.DbConnector("Sudoku")
-        dbAgent.deleteSudokuGame(args[1][4])
+        try:
+            dbAgent = dbc.DbConnector("Sudoku")
+            dbAgent.deleteSudokuGame(args[1][4])
+        except:
+            self.drawErrorPage()
     
     def sorting(self, sortMethod):
         if sortMethod == "Unsorted":
@@ -168,6 +171,21 @@ class Row():
                 textSize = font.size(name)
         return name
     
+    def quitWindow(self):
+        pygame.quit()
+        quit()
+    
+    def drawErrorPage(self):
+        Err = True
+        while Err:
+            for event in pygame.event.get():
+                if event == pygame.QUIT:
+                    Err = False
+            self.window.fill(white)
+            self.W.text("Error occured: Can't reach the DataBase", display_width/2, display_heigth/2)
+            self.W.button(self.window, "Disagree", font, display_width/2, 455, 300, 80, btn, highlight_btn, self.quitWindow)
+        self.quitWindow()
+    
 class Window():
 
     def __init__(self, displayWidth, displayHeigth, Caption, *args):
@@ -204,27 +222,37 @@ class Window():
                 self.drawMenu()
             elif (pageName == "CreateAccount"):
                 self.drawCreateUsername()
+            elif (pageName == "ErrorPage"):
+                self.drawErrorPage()
             
             pygame.display.update()
             self.clock.tick(60)
     
+    def drawErrorPage(self):
+        self.window.fill(white)
+        self.W.text("Error occured: Couldn’t connect to the DataBase", display_width/2, display_heigth/2)
+        self.W.button("Quit", font, 490, 455, 300, 80, btn, highlight_btn, self.quitWindow)
+    
     def drawAlert(self):
         self.window.fill(white)
         self.W.text("WARNING: This is an Alpha program! Use at your own risk!", display_width/2, display_heigth/2)
-        self.W.button(self.window, "Agree", font, 150, 455, 300, 80, btn, highlight_btn, lambda: self.redrawWindow("Login"))
-        self.W.button(self.window, "Disagree", font, 825, 455, 300, 80, btn, highlight_btn, self.quitWindow)
+        self.W.button("Agree", font, 150, 455, 300, 80, btn, highlight_btn, lambda: self.redrawWindow("Login"))
+        self.W.button("Disagree", font, 825, 455, 300, 80, btn, highlight_btn, self.quitWindow)
     
     def drawLogin(self):
-        L = Login()
-        self.username = self.drawUsername()
-        password = self.drawPassword()
-        if L.validateLogin(self.username, password):
-            self.verificationError = False
-            dbAgent = dbc.DbConnector("UserLoginData")
-            self.playerID = dbAgent.returnQueryList("SELECT UserID FROM Sudoku.{} WHERE Username = %s", (self.username,))
-            self.redrawWindow("MainMenu")
-        else:
-            self.verificationError = True 
+        try:
+            L = Login()
+            self.username = self.drawUsername()
+            password = self.drawPassword()
+            if L.validateLogin(self.username, password):
+                self.verificationError = False
+                dbAgent = dbc.DbConnector("UserLoginData")
+                self.playerID = dbAgent.returnQueryList("SELECT UserID FROM Sudoku.{} WHERE Username = %s", (self.username,))
+                self.redrawWindow("MainMenu")
+            else:
+                self.verificationError = True 
+        except:
+            self.redrawWindow("ErrorPage")
 
     def drawUsername(self):
         Input = pi.TextInput()
@@ -330,23 +358,26 @@ class Window():
             Row(self.window, i, self.playerID, Games[i])
                     
     def getList(self):
-        List = li(self.playerID[0][0])
-        if self.sortByAlpha != 0:
-            if self.sortByAlpha == 1:
-                return List.getGames("Alpha Up")
-            elif self.sortByAlpha == -1:
-                return List.getGames("Alpha Down")
-        elif self.sortByNumeric != 0:
-            if self.sortByNumeric == 1:
-               return List.getGames("Numeric Up")
-            elif self.sortByNumeric == -1:
-                return List.getGames("Numeric Down")
-        elif self.sortByAmount != 0:
-            if self.sortByAmount == 1:
-                return List.getGames("Amount Up")
-            elif self.sortByAmount == -1:
-                return List.getGames("Amount Down")
-        return List.getGames("Unsorted")
+        try:
+            List = li(self.playerID[0][0])
+            if self.sortByAlpha != 0:
+                if self.sortByAlpha == 1:
+                    return List.getGames("Alpha Up")
+                elif self.sortByAlpha == -1:
+                    return List.getGames("Alpha Down")
+            elif self.sortByNumeric != 0:
+                if self.sortByNumeric == 1:
+                    return List.getGames("Numeric Up")
+                elif self.sortByNumeric == -1:
+                    return List.getGames("Numeric Down")
+            elif self.sortByAmount != 0:
+                if self.sortByAmount == 1:
+                    return List.getGames("Amount Up")
+                elif self.sortByAmount == -1:
+                    return List.getGames("Amount Down")
+            return List.getGames("Unsorted")
+        except:
+            self.redrawWindow("ErrorPage")
         
     def drawMenu(self):
         self.window.fill(white)
@@ -397,17 +428,20 @@ class Window():
             self.sortByAmount = 0
         
     def createAccount(self):
-        dbAgent = dbc.DbConnector("UserLoginData")
-        L = Login()
-        create_username = self.drawCreateUsername()
-        create_password = self.drawCreatePassword()
-        dbAgent.insertQuery((create_username, create_password))
-        if L.validateLogin(create_username, create_password):
-            self.createdAccount = 1
-            self.redrawWindow("Login")
-        else:
-            self.createdAccount = -1
-            self.redrawWindow("CreateAccount")
+        try:
+            dbAgent = dbc.DbConnector("UserLoginData")
+            L = Login()
+            create_username = self.drawCreateUsername()
+            create_password = self.drawCreatePassword()
+            dbAgent.insertQuery((create_username, create_password))
+            if L.validateLogin(create_username, create_password):
+                self.createdAccount = 1
+                self.redrawWindow("Login")
+            else:
+                self.createdAccount = -1
+                self.redrawWindow("CreateAccount")
+        except:
+            self.redrawWindow("ErrorPage")
     
     def quitWindow(self):
         pygame.quit()

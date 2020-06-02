@@ -286,13 +286,27 @@ def postSave(win, exception):
             if event.type == pygame.QUIT:
                 excep = False
         
-        text(win, exception, font_32, 134, 263)
+        text(win, exception, font_32, 270, 263)
         if exception != "Error occured: Couldn't save to DB":
             button(win, "Back to Main Menu", font_20, 173, 327, 195, 30, btn, highlight_btn)
         button(win, "Quit", font_20, 173, 364, 195, 30, btn, highlight_btn, quitProgram)
         
         pygame.display.update()
     quitProgram()
+    
+def rewrite(win, name, timeCompleted, currentTime, cellsLeft, done, table, *args):
+    if len(args) != 1:
+        uName = args[2]
+    else:
+        uName=name
+    try:        
+        dbAgent = dbc.DbConnector("Sudoku")
+        result = dbAgent.returnQueryList("SELECT SudokuID FROM Sudoku.{} WHERE SudokuName = %s", (uName,))
+        sudokuID = result[0][0]
+        dbAgent.rewriteSudoku((uName, timeCompleted, currentTime, cellsLeft, done, table, sudokuID))
+        postSave(win, "Succesfully saved!")
+    except:
+        postSave(win, "Error occured: Couldn't save to DB")
     
 def upload(win, name, timeCompleted, currentTime, cellsLeft, done, table, playerID, *args):
     if len(args) != 1:
@@ -401,6 +415,8 @@ def saveNquit(win, currentTable, start, *args):
             text(win, "No", font_24, 241, 355)
         button(win,"", font, 222, 370, 277, 1, black, black)#acts like a line
         
+        if len(args) != 1:
+            button(win, "Rewrite", font_20, 195, 449, 150, 30, btn, highlight_btn, lambda: rewrite(win, name, timeCompleted, currentTime, cellsLeft, done, table, *args))
         button(win, "Save", font_20, 195, 484, 150, 30, btn, highlight_btn, lambda: upload(win, name, timeCompleted, currentTime, cellsLeft, done, table, playerID, *args))
         button(win, "Cancel", font_20, 195, 519, 150, 30, btn, highlight_btn, quitProgram)
         

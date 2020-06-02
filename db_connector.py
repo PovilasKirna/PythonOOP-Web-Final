@@ -55,6 +55,11 @@ class DbConnector():
         cursor = self.connection.cursor()
         cursor.execute("INSERT INTO Sudoku.{} (SudokuName, TimeCompleted, TimeCurrent, CellsLeft, Done, Board) VALUES (%s, %s, %s, %s, %s, %s)".format(self.tableTitle), *args)
         self.connection.commit()
+
+    def rewriteSudoku(self, *args):
+        cursor = self.connection.cursor()
+        cursor.execute("UPDATE Sudoku.{} SET TimeCompleted = %s, TimeCurrent = %s, CellsLeft = %s, Done = %s, Board = %s WHERE (SudokuID = %s)".format(self.tableTitle), *args)
+        self.connection.commit()
     
     def connectSudokuPlayer(self, *args):
         cursor = self.connection.cursor()
