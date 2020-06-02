@@ -265,12 +265,16 @@ def button(window, msg, font, x,y,w,h,ic,ac, action = None):
     textSurf, textRect = text_objects(msg, font, black)
     textRect.center = ( (x+(w/2), y+(h/2)) )
     window.blit(textSurf, textRect)
+
+def loadMenu(playerID):
+    pygame.display.quit()
+    pyGUI.Window(1280, 720, "Sudoku", "MainMenu", playerID)
     
 def quitProgram():
-    pygame.quit()
+    pygame.display.quit()
     quit()
     
-def postSave(win, exception):
+def postSave(win, exception, *args):
     pygame.font.init()
     font = pygame.font.SysFont("comicsans", 40)
     font_small = pygame.font.SysFont("comicsans", 24)
@@ -288,7 +292,7 @@ def postSave(win, exception):
         
         text(win, exception, font_32, 270, 263)
         if exception != "Error occured: Couldn't save to DB":
-            button(win, "Back to Main Menu", font_20, 173, 327, 195, 30, btn, highlight_btn)
+            button(win, "Back to Main Menu", font_20, 173, 327, 195, 30, btn, highlight_btn, lambda: loadMenu(args[0]))
         button(win, "Quit", font_20, 173, 364, 195, 30, btn, highlight_btn, quitProgram)
         
         pygame.display.update()
@@ -299,14 +303,12 @@ def rewrite(win, name, timeCompleted, currentTime, cellsLeft, done, table, *args
         uName = args[2]
     else:
         uName=name
-    try:        
-        dbAgent = dbc.DbConnector("Sudoku")
-        result = dbAgent.returnQueryList("SELECT SudokuID FROM Sudoku.{} WHERE SudokuName = %s", (uName,))
-        sudokuID = result[0][0]
-        dbAgent.rewriteSudoku((uName, timeCompleted, currentTime, cellsLeft, done, table, sudokuID))
-        postSave(win, "Succesfully saved!")
-    except:
-        postSave(win, "Error occured: Couldn't save to DB")
+
+    dbAgent = dbc.DbConnector("Sudoku")
+    dbAgent.rewriteSudoku((timeCompleted, currentTime, cellsLeft, done, table, uName))
+    postSave(win, "Succesfully saved!", args[0])
+    # except:
+    #     postSave(win, "Error occured: Couldn't save to DB")
     
 def upload(win, name, timeCompleted, currentTime, cellsLeft, done, table, playerID, *args):
     if len(args) != 1:
@@ -319,7 +321,7 @@ def upload(win, name, timeCompleted, currentTime, cellsLeft, done, table, player
         result = dbAgent.returnQueryList("SELECT SudokuID FROM Sudoku.{} WHERE SudokuName = %s", (uName,))
         sudokuID = result[0][0]
         dbAgent.connectSudokuPlayer((playerID, sudokuID))
-        postSave(win, "Succesfully saved!")
+        postSave(win, "Succesfully saved!", playerID)
     except:
         postSave(win, "Error occured: Couldn't save to DB")
     
@@ -346,9 +348,19 @@ def parseToString(bo):
                 stringTable+="]]"
     return stringTable
 
+def getName(name):
+    dbAgent = dbc.DbConnector("Sudoku")
+    result = dbAgent.returnQueryList("SELECT * FROM Sudoku.{} WHERE SudokuName = %s", (name,))
+    if len(result) != 0:
+        return True
+    return False
+
 def saveNquit(win, currentTable, start, *args):
     if len(args) == 1:
-        playerID = args[0][0][0]
+        try:
+            playerID = args[0][0][0]
+        except:
+            playerID = args[0]
         currentTime = format_time(round(time.time()-start))
     else:
         playerID = args[0]
@@ -415,7 +427,7 @@ def saveNquit(win, currentTable, start, *args):
             text(win, "No", font_24, 241, 355)
         button(win,"", font, 222, 370, 277, 1, black, black)#acts like a line
         
-        if len(args) != 1:
+        if getName(name):
             button(win, "Rewrite", font_20, 195, 449, 150, 30, btn, highlight_btn, lambda: rewrite(win, name, timeCompleted, currentTime, cellsLeft, done, table, *args))
         button(win, "Save", font_20, 195, 484, 150, 30, btn, highlight_btn, lambda: upload(win, name, timeCompleted, currentTime, cellsLeft, done, table, playerID, *args))
         button(win, "Cancel", font_20, 195, 519, 150, 30, btn, highlight_btn, quitProgram)
@@ -451,7 +463,8 @@ def redraw_window(win, board, currentTable, time, strikes, start, *args):
 
 def format_time(secs, *args):
     if args:
-        sec = secs%60+args[0]
+        secs=secs+args[0]
+        sec = secs%60
     else:
         sec = secs%60
     minute = secs//60
@@ -516,7 +529,7 @@ def main(start, *args):
                         elif(strikes>5):
                             print("Game over")
                             run = False
-                            pygame.quit()
+                            pygame.display.quit()
                             return
 
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -599,7 +612,7 @@ def loadGame(*args):
                         elif(strikes>5):
                             print("Game over")
                             run = False
-                            pygame.quit()
+                            pygame.display.quit()
                             return
 
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -623,9 +636,6 @@ def startgame(playerID):
     main(start, playerID)
 
 if __name__ == "__main__":
-    # start = time.time()
-    # main(start)
-    # pygame.quit()
-    pyGUI.Window(1280, 720, "Sudoku")
+    pyGUI.Window(1280, 720, "Sudoku", "Login")
     pygame.quit()
     quit()

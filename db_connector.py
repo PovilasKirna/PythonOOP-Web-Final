@@ -37,6 +37,11 @@ class DbConnector():
         resultList = cursor.fetchall()
         return resultList
     
+    def returnSpecificQuery(self, query, *args):
+        cursor = self.connection.cursor()
+        result = cursor.execute(query.format(self.tableTitle), *args)
+        return result
+    
     def printList(self, resultList):
         for row in resultList:  
             print(row)
@@ -58,7 +63,7 @@ class DbConnector():
 
     def rewriteSudoku(self, *args):
         cursor = self.connection.cursor()
-        cursor.execute("UPDATE Sudoku.{} SET TimeCompleted = %s, TimeCurrent = %s, CellsLeft = %s, Done = %s, Board = %s WHERE (SudokuID = %s)".format(self.tableTitle), *args)
+        cursor.execute("UPDATE Sudoku.{} SET TimeCompleted = %s, TimeCurrent = %s, CellsLeft = %s, Done = %s, Board = %s WHERE (SudokuName = %s)".format(self.tableTitle), *args)
         self.connection.commit()
     
     def connectSudokuPlayer(self, *args):

@@ -41,6 +41,8 @@ sortAlphaUpImg = pygame.image.load("icons/sort-alpha-up.png")
 sortAlphaDownImg = pygame.image.load("icons/sort-alpha-down.png")
 sortAmountUpImg = pygame.image.load("icons/sort-amount-up.png")
 sortAmountDownImg = pygame.image.load("icons/sort-amount-down.png")
+icon = pygame.image.load("icons/icon.png")
+pygame.display.set_icon(icon)
 
 class Widgets():
     def __init__(self, window):
@@ -105,7 +107,7 @@ class Row():
     def loadGame(self, *args):
         # print(args)
         # print("playerID:", args[0][0][0], "sudokuID:", args[1][4], "sudokuName:", args[1][0], "time:", args[1][1], "board:", args[1][5])
-        pygame.quit()
+        pygame.display.quit()
         GUI.loadGame(args[0][0][0],args[1][4], args[1][0], args[1][1], args[1][5])
         
     def deleteRow(self, *args):
@@ -172,7 +174,7 @@ class Row():
         return name
     
     def quitWindow(self):
-        pygame.quit()
+        pygame.display.quit()
         quit()
     
     def drawErrorPage(self):
@@ -188,14 +190,18 @@ class Row():
     
 class Window():
 
-    def __init__(self, displayWidth, displayHeigth, Caption, *args):
+    def __init__(self, displayWidth, displayHeigth, Caption, startingpage, *args):
         self.window = pygame.display.set_mode((display_width, display_heigth))
         pygame.display.set_caption(Caption)
         self.clock = pygame.time.Clock()
-        self.playerID = None
+        self.username = ""
+        if startingpage == "MainMenu" and len(args) != 0:
+            self.playerID = args[0]
+            self.username = self.getUsername(args[0])
+        else:
+            self.playerID = None
         self.Username = True
         self.Password = False
-        self.username = args
         self.verificationError = False
         self.createdAccount = 0
         self.sortByAlpha = 0
@@ -203,7 +209,7 @@ class Window():
         self.sortByAmount = 0
         self.W = Widgets(self.window)
         #self.redrawWindow("Alert")
-        self.redrawWindow("Login")
+        self.redrawWindow(startingpage)
         
     def redrawWindow(self, pageName):
         while run:
@@ -262,7 +268,7 @@ class Window():
             events = pygame.event.get()
             for event in events:
                 if event.type == pygame.QUIT:
-                    pygame.quit()
+                    pygame.display.quit()
                     quit()
             if(Input.update(events) == 1):
                 self.submit()
@@ -382,6 +388,7 @@ class Window():
     def drawMenu(self):
         self.window.fill(white)
         self.W.text("Main Menu", display_width/2, 115)
+        print("ok", self.username)
         self.W.small_text(self.username, 1200, 25)
         self.W.button("Log Out", font_small, 1130, 45, 140, 35, btn, highlight_btn, lambda: self.redrawWindow("Login"))
         self.W.button("New Game", font, 490, 202, 300, 60, btn, highlight_btn, self.startGame)
@@ -389,7 +396,7 @@ class Window():
         self.W.button("Quit", font, 490, 404, 300, 60, btn, highlight_btn, self.quitWindow)
 
     def startGame(self):
-        pygame.quit()
+        pygame.display.quit()
         GUI.startgame(self.playerID)
         
     def submit(self):
@@ -399,6 +406,11 @@ class Window():
         elif not self.Username and self.Password:
             self.Username = True
             self.Password = False
+
+    def getUsername(self, ID):
+        dbAgent = dbc.DbConnector("UserLoginData")
+        username = dbAgent.returnSpecificQuery("SELECT Username FROM Sudoku.{} WHERE UserID = %s", (ID,))
+        return username
 
     def sort(self, sortBy):
         thisturn = False
@@ -444,10 +456,11 @@ class Window():
             self.redrawWindow("ErrorPage")
     
     def quitWindow(self):
-        pygame.quit()
+        pygame.display.quit()
         quit()
 
+
 if __name__ == "__main__":
-    Window(display_width, display_heigth, "Sudoku")
+    win = Window(display_width, display_heigth, "Sudoku", "Login")
     pygame.quit()
     quit()
