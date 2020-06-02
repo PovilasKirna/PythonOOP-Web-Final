@@ -35,12 +35,6 @@ font_small = pygame.font.SysFont("robotoregularttf", 24)
 playImg = pygame.image.load("icons/play.png")
 trashImg = pygame.image.load("icons/trash.png")
 sortImg = pygame.image.load("icons/sort.png")
-# sortNumericUpImg = pygame.image.load("icons/sort-numeric-up.png")
-# sortNumericDownImg = pygame.image.load("icons/sort-numeric-down.png")
-# sortAlphaUpImg = pygame.image.load("icons/sort-alpha-up.png")
-# sortAlphaDownImg = pygame.image.load("icons/sort-alpha-down.png")
-# sortAmountUpImg = pygame.image.load("icons/sort-amount-up.png")
-# sortAmountDownImg = pygame.image.load("icons/sort-amount-down.png")
 icon = pygame.image.load("icons/icon.png")
 pygame.display.set_icon(icon)
 
@@ -104,18 +98,27 @@ class Row():
             self.window.blit(trashImg, (978, (230+self.index*109)))
             self.W.button("", font, 258, (302+self.index*109), 763, 1, black, black)#acts like a line
         
+    def sorting(self, sortMethod):
+        if sortMethod == "Unsorted":
+            self.window.blit(sortImg, (442, 169))
+            self.window.blit(sortImg, (699, 169))
+            self.window.blit(sortImg, (819, 169))
+        
     def loadGame(self, *args):
-        # print(args)
-        # print("playerID:", args[0][0][0], "sudokuID:", args[1][4], "sudokuName:", args[1][0], "time:", args[1][1], "board:", args[1][5])
         pygame.display.quit()
-        GUI.loadGame(args[0][0][0],args[1][4], args[1][0], args[1][1], args[1][5])
+        if type(args[0]) != int:
+            GUI.loadGame(args[0][0][0],args[1][4], args[1][0], args[1][1], args[1][5])
+        else:
+            GUI.loadGame(args[0],args[1][4], args[1][0], args[1][1], args[1][5])
         
     def deleteRow(self, *args):
         try:
+            print("esu delete")
             dbAgent = dbc.DbConnector("Sudoku")
             dbAgent.deleteSudokuGame(args[1][4])
         except:
             self.drawErrorPage()
+            
             
     def shortenNameToFit(self, name):
         textSize = font.size(name)
@@ -162,6 +165,7 @@ class Window():
 
     def __init__(self, displayWidth, displayHeigth, Caption, startingpage, *args):
         self.window = pygame.display.set_mode((display_width, display_heigth))
+        self.dbAgent = dbc.DbConnector("UserLoginData")
         pygame.display.set_caption(Caption)
         self.clock = pygame.time.Clock()
         self.username = ""
@@ -178,8 +182,6 @@ class Window():
         self.sortByNumeric = 0
         self.sortByAmount = 0
         self.W = Widgets(self.window)
-        self.dbAgent = dbc.DbConnector("UserLoginData")
-        #self.redrawWindow("Alert")
         self.redrawWindow(startingpage)
         
     def redrawWindow(self, pageName):
@@ -218,6 +220,7 @@ class Window():
     
     def drawLogin(self):
         try:
+            print("esu login")
             L = Login()
             self.username = self.drawUsername()
             password = self.drawPassword()
@@ -261,12 +264,13 @@ class Window():
     def drawCreateUsername(self):
         Input = pi.TextInput()
         while self.Username:
+            print("esu create use")
             self.window.fill(white)
 
             events = pygame.event.get()
             for event in events:
                 if event.type == pygame.QUIT:
-                    exit()
+                    pygame.display.quit()
             if(Input.update(events) == 1):
                 self.submit()
             self.window.blit(Input.get_surface(), (490, 341))
@@ -302,6 +306,7 @@ class Window():
     def drawCreatePassword(self):
         Input = pi.TextInput()
         while self.Password:
+            print("esu create pass")
             self.window.fill(white)
 
             events = pygame.event.get()
@@ -335,7 +340,10 @@ class Window():
                     
     def getList(self):
         try:
-            List = li(self.playerID[0][0])
+            if type(self.playerID) != int:
+                List = li(self.playerID[0][0])
+            else:
+                List = li(self.playerID)
             if self.sortByAlpha != 0:
                 if self.sortByAlpha == 1:
                     return List.getGames("Alpha Up")
@@ -358,7 +366,6 @@ class Window():
     def drawMenu(self):
         self.window.fill(white)
         self.W.text("Main Menu", display_width/2, 115)
-        print("ok", self.username)
         self.W.small_text(self.username, 1200, 25)
         self.W.button("Log Out", font_small, 1130, 45, 140, 35, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("Login"))
         self.W.button("New Game", font, 490, 202, 300, 60, ButtonPrimaryColor, ButtonHighlightColor, self.startGame)
@@ -378,8 +385,8 @@ class Window():
             self.Password = False
 
     def getUsername(self, ID):
-        username = self.dbAgent.returnSpecificQuery("SELECT Username FROM Sudoku.{} WHERE UserID = %s", (ID,))
-        return username
+        username = self.dbAgent.returnQueryList("SELECT Username FROM Sudoku.{} WHERE UserID = %s", (ID,))
+        return username[0][0]
 
     def sort(self, sortBy):
         thisturn = False
@@ -410,6 +417,7 @@ class Window():
         
     def createAccount(self):
         try:
+            print("esu create acc")
             L = Login()
             create_username = self.drawCreateUsername()
             create_password = self.drawCreatePassword()
@@ -429,6 +437,6 @@ class Window():
 
 
 if __name__ == "__main__":
-    win = Window(display_width, display_heigth, "Sudoku", "Login")
+    win = Window(display_width, display_heigth, "Sudoku", "Alert")
     pygame.quit()
     quit()

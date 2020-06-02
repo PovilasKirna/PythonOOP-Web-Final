@@ -37,11 +37,6 @@ class DbConnector():
         resultList = cursor.fetchall()
         return resultList
     
-    def returnSpecificQuery(self, query, *args):
-        cursor = self.connection.cursor()
-        result = cursor.execute(query.format(self.tableTitle), *args)
-        return result
-    
     def printList(self, resultList):
         for row in resultList:  
             print(row)
