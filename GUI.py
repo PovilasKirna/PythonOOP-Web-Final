@@ -25,6 +25,9 @@ font_32 = pygame.font.SysFont("robotoregularttf", 32)
 font_24 = pygame.font.SysFont("robotoregularttf", 24)
 font_20 = pygame.font.SysFont("robotoregularttf", 20)
 
+dbAgent = dbc.DbConnector("Sudoku")
+
+
 class Grid:
     sudoku = generator.Sudoku(9, 43)#43
     board = sudoku.returnBoard()
@@ -268,6 +271,7 @@ def button(window, msg, font, x,y,w,h,ic,ac, action = None):
 
 def loadMenu(playerID):
     pygame.display.quit()
+    
     pyGUI.Window(1280, 720, "Sudoku", "MainMenu", playerID)
     
 def quitProgram():
@@ -304,7 +308,6 @@ def rewrite(win, name, timeCompleted, currentTime, cellsLeft, done, table, *args
     else:
         uName=name
 
-    dbAgent = dbc.DbConnector("Sudoku")
     dbAgent.rewriteSudoku((timeCompleted, currentTime, cellsLeft, done, table, uName))
     postSave(win, "Succesfully saved!", args[0])
     # except:
@@ -316,7 +319,6 @@ def upload(win, name, timeCompleted, currentTime, cellsLeft, done, table, player
     else:
         uName=name
     try:        
-        dbAgent = dbc.DbConnector("Sudoku")
         dbAgent.saveSudoku((uName, timeCompleted, currentTime, cellsLeft, done, table))
         result = dbAgent.returnQueryList("SELECT SudokuID FROM Sudoku.{} WHERE SudokuName = %s", (uName,))
         sudokuID = result[0][0]
@@ -349,7 +351,6 @@ def parseToString(bo):
     return stringTable
 
 def getName(name):
-    dbAgent = dbc.DbConnector("Sudoku")
     result = dbAgent.returnQueryList("SELECT * FROM Sudoku.{} WHERE SudokuName = %s", (name,))
     if len(result) != 0:
         return True

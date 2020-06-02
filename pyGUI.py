@@ -21,8 +21,8 @@ delete_red = (241, 157, 157)
 highlight_delete_red = (244, 200, 200)
 play_green = (160, 241, 157)
 highlight_play_green = (205, 244, 200)
-btn = (157, 209, 241)
-highlight_btn = (200, 224, 244)
+ButtonPrimaryColor = (157, 209, 241)
+ButtonHighlightColor = (200, 224, 244)
 transparent = (0, 0, 0, 0)
 sortImg = (5,151,240)
 
@@ -35,12 +35,12 @@ font_small = pygame.font.SysFont("robotoregularttf", 24)
 playImg = pygame.image.load("icons/play.png")
 trashImg = pygame.image.load("icons/trash.png")
 sortImg = pygame.image.load("icons/sort.png")
-sortNumericUpImg = pygame.image.load("icons/sort-numeric-up.png")
-sortNumericDownImg = pygame.image.load("icons/sort-numeric-down.png")
-sortAlphaUpImg = pygame.image.load("icons/sort-alpha-up.png")
-sortAlphaDownImg = pygame.image.load("icons/sort-alpha-down.png")
-sortAmountUpImg = pygame.image.load("icons/sort-amount-up.png")
-sortAmountDownImg = pygame.image.load("icons/sort-amount-down.png")
+# sortNumericUpImg = pygame.image.load("icons/sort-numeric-up.png")
+# sortNumericDownImg = pygame.image.load("icons/sort-numeric-down.png")
+# sortAlphaUpImg = pygame.image.load("icons/sort-alpha-up.png")
+# sortAlphaDownImg = pygame.image.load("icons/sort-alpha-down.png")
+# sortAmountUpImg = pygame.image.load("icons/sort-amount-up.png")
+# sortAmountDownImg = pygame.image.load("icons/sort-amount-down.png")
 icon = pygame.image.load("icons/icon.png")
 pygame.display.set_icon(icon)
 
@@ -94,9 +94,9 @@ class Row():
         name = self.shortenNameToFit(str(args[1][0]))
             
         if self.index <= 3:
-            self.W.button("", font, 258, (218+self.index*109), 382, 60, btn, btn)
-            self.W.button((str(81-args[1][2])+"/81"), font, 650, (218+self.index*109), 111, 60, btn, btn)
-            self.W.button(str(args[1][1]), font, 771, (218+self.index*109), 111, 60, btn, btn)
+            self.W.button("", font, 258, (218+self.index*109), 382, 60, ButtonPrimaryColor, ButtonPrimaryColor)
+            self.W.button((str(81-args[1][2])+"/81"), font, 650, (218+self.index*109), 111, 60, ButtonPrimaryColor, ButtonPrimaryColor)
+            self.W.button(str(args[1][1]), font, 771, (218+self.index*109), 111, 60, ButtonPrimaryColor, ButtonPrimaryColor)
             self.W.button("", font, 891, (218+self.index*109), 60, 60, play_green, highlight_play_green,lambda: self.loadGame(*args))
             self.W.button("", font, 961, (218+self.index*109), 60, 60, delete_red, highlight_delete_red, lambda: self.deleteRow(*args))
             self.W.textAllignLeft(name, 282, (272+self.index*109))
@@ -116,36 +116,6 @@ class Row():
             dbAgent.deleteSudokuGame(args[1][4])
         except:
             self.drawErrorPage()
-    
-    def sorting(self, sortMethod):
-        if sortMethod == "Unsorted":
-            self.window.blit(sortImg, (442, 169))
-            self.window.blit(sortImg, (699, 169))
-            self.window.blit(sortImg, (819, 169))
-        elif sortMethod == "Sort by Alpha Up":
-            self.window.blit(sortAlphaUpImg, (442, 169))
-            self.window.blit(sortImg, (699, 169))
-            self.window.blit(sortImg, (819, 169))
-        elif sortMethod == "Sort by Alpha Down":
-            self.window.blit(sortAlphaDownImg, (442, 169))
-            self.window.blit(sortImg, (699, 169))
-            self.window.blit(sortImg, (819, 169))
-        elif sortMethod == "Sort by Numeric Up":
-            self.window.blit(sortImg, (699, 169))
-            self.window.blit(sortNumericUpImg, (819, 169))
-            self.window.blit(sortImg, (819, 169))
-        elif sortMethod == "Sort by Numeric Down":
-            self.window.blit(sortImg, (699, 169))
-            self.window.blit(sortNumericDownImg, (819, 169))
-            self.window.blit(sortImg, (819, 169))
-        elif sortMethod == "Sort by Amount Up":
-            self.window.blit(sortImg, (699, 169))
-            self.window.blit(sortImg, (819, 169))
-            self.window.blit(sortAmountUpImg, (699, 169))
-        elif sortMethod == "Sort by Amount Down":
-            self.window.blit(sortImg, (699, 169))
-            self.window.blit(sortImg, (819, 169))
-            self.window.blit(sortAmountDownImg, (699, 169))
             
     def shortenNameToFit(self, name):
         textSize = font.size(name)
@@ -185,7 +155,7 @@ class Row():
                     Err = False
             self.window.fill(white)
             self.W.text("Error occured: Can't reach the DataBase", display_width/2, display_heigth/2)
-            self.W.button(self.window, "Disagree", font, display_width/2, 455, 300, 80, btn, highlight_btn, self.quitWindow)
+            self.W.button(self.window, "Disagree", font, display_width/2, 455, 300, 80, ButtonPrimaryColor, ButtonHighlightColor, self.quitWindow)
         self.quitWindow()
     
 class Window():
@@ -208,6 +178,7 @@ class Window():
         self.sortByNumeric = 0
         self.sortByAmount = 0
         self.W = Widgets(self.window)
+        self.dbAgent = dbc.DbConnector("UserLoginData")
         #self.redrawWindow("Alert")
         self.redrawWindow(startingpage)
         
@@ -237,13 +208,13 @@ class Window():
     def drawErrorPage(self):
         self.window.fill(white)
         self.W.text("Error occured: Couldn’t connect to the DataBase", display_width/2, display_heigth/2)
-        self.W.button("Quit", font, 490, 455, 300, 80, btn, highlight_btn, self.quitWindow)
+        self.W.button("Quit", font, 490, 455, 300, 80, ButtonPrimaryColor, ButtonHighlightColor, self.quitWindow)
     
     def drawAlert(self):
         self.window.fill(white)
         self.W.text("WARNING: This is an Alpha program! Use at your own risk!", display_width/2, display_heigth/2)
-        self.W.button("Agree", font, 150, 455, 300, 80, btn, highlight_btn, lambda: self.redrawWindow("Login"))
-        self.W.button("Disagree", font, 825, 455, 300, 80, btn, highlight_btn, self.quitWindow)
+        self.W.button("Agree", font, 150, 455, 300, 80, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("Login"))
+        self.W.button("Disagree", font, 825, 455, 300, 80, ButtonPrimaryColor, ButtonHighlightColor, self.quitWindow)
     
     def drawLogin(self):
         try:
@@ -252,8 +223,7 @@ class Window():
             password = self.drawPassword()
             if L.validateLogin(self.username, password):
                 self.verificationError = False
-                dbAgent = dbc.DbConnector("UserLoginData")
-                self.playerID = dbAgent.returnQueryList("SELECT UserID FROM Sudoku.{} WHERE Username = %s", (self.username,))
+                self.playerID = self.dbAgent.returnQueryList("SELECT UserID FROM Sudoku.{} WHERE Username = %s", (self.username,))
                 self.redrawWindow("MainMenu")
             else:
                 self.verificationError = True 
@@ -281,9 +251,9 @@ class Window():
                 self.W.text("User created succesfully", display_width/2, 680)
             elif self.createdAccount == -1:
                 self.W.text("Failed to create user", display_width/2, 680)
-            self.W.button("Continue", font, 417, 510, 200, 60, btn, highlight_btn, self.submit)
-            self.W.button("Cancel", font, 663, 510, 200, 60, btn, highlight_btn, self.quitWindow)
-            self.W.button("Don't have an account? Create one", font_small, 417, 590, 446, 60, btn, highlight_btn, self.createAccount)
+            self.W.button("Continue", font, 417, 510, 200, 60, ButtonPrimaryColor, ButtonHighlightColor, self.submit)
+            self.W.button("Cancel", font, 663, 510, 200, 60, ButtonPrimaryColor, ButtonHighlightColor, self.quitWindow)
+            self.W.button("Don't have an account? Create one", font_small, 417, 590, 446, 60, ButtonPrimaryColor, ButtonHighlightColor, self.createAccount)
             pygame.display.update()
             self.clock.tick(60)
         return Input.get_text()
@@ -302,8 +272,8 @@ class Window():
             self.window.blit(Input.get_surface(), (490, 341))
 
             self.W.text("Create Username:", display_width/2, 300)
-            self.W.button("Continue", font, 417, 510, 200, 60, btn, highlight_btn, self.submit)
-            self.W.button("Cancel", font, 663, 510, 200, 60, btn, highlight_btn, lambda: self.redrawWindow("Login"))
+            self.W.button("Continue", font, 417, 510, 200, 60, ButtonPrimaryColor, ButtonHighlightColor, self.submit)
+            self.W.button("Cancel", font, 663, 510, 200, 60, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("Login"))
             pygame.display.update()
             self.clock.tick(60)
         return Input.get_text()
@@ -323,8 +293,8 @@ class Window():
             self.window.blit(Input.get_surface(), (490, 341))
         
             self.W.text("Password:", 497, 300)
-            self.W.button("Login", font, 417, 510, 200, 60, btn, highlight_btn, self.submit)
-            self.W.button("Cancel", font, 663, 510, 200, 60, btn, highlight_btn, self.quitWindow)
+            self.W.button("Login", font, 417, 510, 200, 60, ButtonPrimaryColor, ButtonHighlightColor, self.submit)
+            self.W.button("Cancel", font, 663, 510, 200, 60, ButtonPrimaryColor, ButtonHighlightColor, self.quitWindow)
             pygame.display.update()
             self.clock.tick(60)
         return Input.convertToPassword()
@@ -343,8 +313,8 @@ class Window():
             self.window.blit(Input.get_surface(), (490, 341))
         
             self.W.text("Create Password:", display_width/2, 300)
-            self.W.button("Create", font, 417, 510, 200, 60, btn, highlight_btn, self.submit)
-            self.W.button("Cancel", font, 663, 510, 200, 60, btn, highlight_btn, lambda: self.redrawWindow("Login"))
+            self.W.button("Create", font, 417, 510, 200, 60, ButtonPrimaryColor, ButtonHighlightColor, self.submit)
+            self.W.button("Cancel", font, 663, 510, 200, 60, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("Login"))
             pygame.display.update()
             self.clock.tick(60)
         return Input.get_text()
@@ -353,11 +323,11 @@ class Window():
         self.window.fill(white)
         self.W.text("Load Game", display_width/2, 115)
         self.W.small_text(self.username, 1200, 25)
-        self.W.button("Log Out", font_small, 1130, 45, 140, 35, btn, highlight_btn, lambda: self.redrawWindow("Login"))
-        self.W.button("Back", font_small, 15, 10, 140, 35, btn, highlight_btn, lambda: self.redrawWindow("MainMenu"))
-        self.W.button("", font, 259, 164, 382, 30, btn, highlight_btn, lambda: self.sort("Alpha"))
-        self.W.button("", font, 650, 164, 111, 30, btn, highlight_btn,  lambda: self.sort("Amount"))
-        self.W.button("", font, 771, 164, 111, 30, btn, highlight_btn, lambda: self.sort("Numeric"))
+        self.W.button("Log Out", font_small, 1130, 45, 140, 35, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("Login"))
+        self.W.button("Back", font_small, 15, 10, 140, 35, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("MainMenu"))
+        self.W.button("", font, 259, 164, 382, 30, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.sort("Alpha"))
+        self.W.button("", font, 650, 164, 111, 30, ButtonPrimaryColor, ButtonHighlightColor,  lambda: self.sort("Amount"))
+        self.W.button("", font, 771, 164, 111, 30, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.sort("Numeric"))
         
         Games = self.getList()
         for i in range(len(Games)):
@@ -390,10 +360,10 @@ class Window():
         self.W.text("Main Menu", display_width/2, 115)
         print("ok", self.username)
         self.W.small_text(self.username, 1200, 25)
-        self.W.button("Log Out", font_small, 1130, 45, 140, 35, btn, highlight_btn, lambda: self.redrawWindow("Login"))
-        self.W.button("New Game", font, 490, 202, 300, 60, btn, highlight_btn, self.startGame)
-        self.W.button("Load Game", font, 490, 303, 300, 60, btn, highlight_btn, lambda: self.redrawWindow("LoadGame"))
-        self.W.button("Quit", font, 490, 404, 300, 60, btn, highlight_btn, self.quitWindow)
+        self.W.button("Log Out", font_small, 1130, 45, 140, 35, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("Login"))
+        self.W.button("New Game", font, 490, 202, 300, 60, ButtonPrimaryColor, ButtonHighlightColor, self.startGame)
+        self.W.button("Load Game", font, 490, 303, 300, 60, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("LoadGame"))
+        self.W.button("Quit", font, 490, 404, 300, 60, ButtonPrimaryColor, ButtonHighlightColor, self.quitWindow)
 
     def startGame(self):
         pygame.display.quit()
@@ -408,8 +378,7 @@ class Window():
             self.Password = False
 
     def getUsername(self, ID):
-        dbAgent = dbc.DbConnector("UserLoginData")
-        username = dbAgent.returnSpecificQuery("SELECT Username FROM Sudoku.{} WHERE UserID = %s", (ID,))
+        username = self.dbAgent.returnSpecificQuery("SELECT Username FROM Sudoku.{} WHERE UserID = %s", (ID,))
         return username
 
     def sort(self, sortBy):
@@ -441,11 +410,10 @@ class Window():
         
     def createAccount(self):
         try:
-            dbAgent = dbc.DbConnector("UserLoginData")
             L = Login()
             create_username = self.drawCreateUsername()
             create_password = self.drawCreatePassword()
-            dbAgent.insertQuery((create_username, create_password))
+            self.dbAgent.insertQuery((create_username, create_password))
             if L.validateLogin(create_username, create_password):
                 self.createdAccount = 1
                 self.redrawWindow("Login")

@@ -1,0 +1,305 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;900&display=swap');
+/*
+Color scheme:
+Peach: #F7C59F
+
+Dark
+#2A324B
+#C7CCDB
+#E1E5EE
+Light
+*/
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+html {
+	height: 100%;
+}
+
+body {
+	background: #C7CCDB;
+	font-family: 'Montserrat', sans-serif;
+	color: #2A324B;
+	text-decoration: none;
+	height: 100%;
+}
+
+.paimtosKnygosTable {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+}
+
+.paimtosKnygosTable table {
+	background: #E1E5EE;
+	border-radius: 10px;
+	border-collapse: collapse;
+}
+
+.paimtosKnygosTable table tr {
+	font-family: 'Montserrat', sans-serif;
+	color: #2A324B;
+	text-decoration: none;
+	/* border-bottom: 1px solid #2A324B; */
+}
+
+/* .paimtosKnygosTable table tr:last-child {
+	border: 0;
+}
+
+.paimtosKnygosTable table tr:first-child {
+	border: 0;
+} */
+
+
+.paimtosKnygosTable table tr th {
+	width: 150px;
+	text-align: center;
+	padding: 5px
+}
+
+
+.paimtosKnygosTable table tr td {
+	width: 150px;
+	text-align: center;
+	padding: 5px
+}
+
+.myFormFormat {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+}
+
+.myFormFormat h1 {
+	text-align: center;
+}
+
+.form-style-1 {
+	margin: 10px auto;
+	max-width: 400px;
+	padding: 20px 12px 10px 20px;
+	background: #E1E5EE;
+	border-radius: 10px;
+}
+
+.form-style-1 li {
+	padding: 0;
+	display: block;
+	list-style: none;
+	margin: 10px 0 0 0;
+}
+
+
+
+.form-style-1 label {
+	margin: 0 0 3px 0;
+	padding: 0px;
+	display: block;
+	font-weight: 500;
+}
+
+.form-style-1 input[type=text],
+.form-style-1 input[type=date],
+.form-style-1 input[type=datetime],
+.form-style-1 input[type=number],
+.form-style-1 input[type=search],
+.form-style-1 input[type=time],
+.form-style-1 input[type=url],
+.form-style-1 input[type=email],
+textarea,
+select {
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	border: 1px solid #BEBEBE;
+	padding: 7px;
+	margin: 0px;
+	outline: none;
+}
+
+.form-style-1 input[type=text]:focus,
+.form-style-1 input[type=date]:focus,
+.form-style-1 input[type=datetime]:focus,
+.form-style-1 input[type=number]:focus,
+.form-style-1 input[type=search]:focus,
+.form-style-1 input[type=time]:focus,
+.form-style-1 input[type=url]:focus,
+.form-style-1 input[type=email]:focus,
+.form-style-1 textarea:focus,
+.form-style-1 select:focus {
+	-moz-box-shadow: 0 0 8px #F7C59F;
+	-webkit-box-shadow: 0 0 8px #F7C59F;
+	box-shadow: 0 0 8px #F7C59F;
+	border: 1px solid #F7C59F;
+}
+
+.form-style-1 .field-divided {
+	width: 49%;
+}
+
+.form-style-1 .field-long {
+	width: 100%;
+}
+
+.form-style-1 .field-select {
+	width: 100%;
+}
+
+.form-style-1 .field-textarea {
+	height: 100px;
+}
+
+.form-style-1 input[type=submit],
+.form-style-1 input[type=button] {
+	background: #C7CCDB;
+	padding: 8px 15px 8px 15px;
+	border: none;
+	color: #2A324B;
+}
+
+.form-style-1 input[type=submit]:hover,
+.form-style-1 input[type=button]:hover {
+	background: #F7C59F;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+}
+
+.form-style-1 .required {
+	color: red;
+}
+
+header {
+	background: #E1E5EE;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 50px;
+	display: flex;
+	align-items: center;
+}
+
+header * {
+	display: inline;
+}
+
+header li {
+	margin: 20px;
+}
+
+header li a {
+	color: black;
+	text-decoration: none;
+}
+
+.container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	height: 100%;
+}
+
+.container #menu {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 300px;
+	height: 300px;
+	background: #E1E5EE;
+	border-radius: 10px;
+}
+
+.container #menu ul li a {
+	text-decoration: none;
+	font-family: 'Montserrat', sans-serif;
+	font-size: 24px;
+	color: #2A324B;
+}
+
+.container h1 {
+	font-size: 32px;
+	text-align: center;
+	font-weight: 800;
+}
+
+.container #menu ul {
+	padding: 0;
+}
+
+.container #menu ul li {
+	list-style: none;
+	text-align: center;
+}
+
+#error-box {
+	top: 300px;
+}
+
+.searchForm {
+	width: 600px;
+	height: 50px;
+	display: inline-flex;
+	justify-content: space-around;
+	align-items: center;
+	background: #E1E5EE;
+	border-radius: 10px;
+}
+
+.searchForm li {
+	padding: 0;
+	display: inline-block;
+	list-style: none;
+}
+
+.searchForm ul {
+	padding-inline-start: 0px;
+}
+
+.searchForm input[type=text],
+textarea,
+select {
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	border: 1px solid #BEBEBE;
+	padding: 7px;
+	margin: 0px;
+	outline: none;
+	width: 200px;
+}
+
+.searchForm input[type=text]:focus,
+.searchForm textarea:focus,
+.searchForm select:focus {
+	-moz-box-shadow: 0 0 8px #F7C59F;
+	-webkit-box-shadow: 0 0 8px #F7C59F;
+	box-shadow: 0 0 8px #F7C59F;
+	border: 1px solid #F7C59F;
+}
+
+.searchForm input[type=submit],
+.searchForm input[type=button] {
+	background: #C7CCDB;
+	padding: 8px 15px 8px 15px;
+	border: none;
+	color: #2A324B;
+	width: 100px;
+}
+
+.searchForm input[type=submit]:hover,
+.searchForm input[type=button]:hover {
+	background: #F7C59F;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+}
