@@ -103,13 +103,14 @@ class Row():
             self.W.button("", font, 258, (302+self.index*109), 763, 1, black, black)#acts like a line
         
     def loadGame(self, *args):
-        print("time:", args[1][1], "board:", args[1][5], "playerID:", args[0][0][0], "sudokuID:", args[1][4])
-        #pygame.quit()
-        #GUI.loadGame(args[0][1], args[0][5], args[1], args[0][4])
+        # print(args)
+        # print("playerID:", args[0][0][0], "sudokuID:", args[1][4], "sudokuName:", args[1][0], "time:", args[1][1], "board:", args[1][5])
+        pygame.quit()
+        GUI.loadGame(args[0][0][0],args[1][4], args[1][0], args[1][1], args[1][5])
         
     def deleteRow(self, *args):
         dbAgent = dbc.DbConnector("Sudoku")
-        dbAgent.deleteSudokuGame(args[0][4])
+        dbAgent.deleteSudokuGame(args[1][4])
     
     def sorting(self, sortMethod):
         if sortMethod == "Unsorted":

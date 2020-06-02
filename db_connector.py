@@ -48,7 +48,7 @@ class DbConnector():
 
     def deleteSudokuGame(self, *args):
         cursor = self.connection.cursor()
-        result = cursor.execute("DELETE FROM Sudoku.{} WHERE (SudokuID = %s)".format(self.tableTitle), *args)
+        result = cursor.execute("DELETE FROM Sudoku.{} WHERE (SudokuID = %s)".format(self.tableTitle), (*args,))
         self.connection.commit()
 
     def saveSudoku(self, *args):
