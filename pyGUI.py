@@ -113,7 +113,6 @@ class Row():
         
     def deleteRow(self, *args):
         try:
-            print("esu delete")
             dbAgent = dbc.DbConnector("Sudoku")
             dbAgent.deleteSudokuGame(args[1][4])
         except:
@@ -220,7 +219,6 @@ class Window():
     
     def drawLogin(self):
         try:
-            print("esu login")
             L = Login()
             self.username = self.drawUsername()
             password = self.drawPassword()
@@ -264,7 +262,6 @@ class Window():
     def drawCreateUsername(self):
         Input = pi.TextInput()
         while self.Username:
-            print("esu create use")
             self.window.fill(white)
 
             events = pygame.event.get()
@@ -306,7 +303,6 @@ class Window():
     def drawCreatePassword(self):
         Input = pi.TextInput()
         while self.Password:
-            print("esu create pass")
             self.window.fill(white)
 
             events = pygame.event.get()
@@ -417,7 +413,6 @@ class Window():
         
     def createAccount(self):
         try:
-            print("esu create acc")
             L = Login()
             create_username = self.drawCreateUsername()
             create_password = self.drawCreatePassword()

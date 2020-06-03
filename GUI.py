@@ -375,7 +375,6 @@ def saveNquit(win, currentTable, start, *args):
         done = False
         timeCompleted = None
         
-    print("Id: ", playerID, "Curent time:", currentTime, "Completed time:", timeCompleted, "Cells left:", cellsLeft, "Done:", done, "Table:", table)
     clock = pygame.time.Clock()
     
     pygame.font.init()
@@ -475,7 +474,6 @@ def format_time(secs, *args):
     return mat
     
 def main(start, *args):
-    print("main:", args)
     pygame.init()
     win = pygame.display.set_mode((540,600))
     clock = pygame.time.Clock()
@@ -550,14 +548,12 @@ def main(start, *args):
     return play_time
 
 def loadGame(*args):
-    print("load:", args)
     pygame.init()
     win = pygame.display.set_mode((540,600))
     clock = pygame.time.Clock()
     pygame.display.set_caption("Sudoku")
     board = Grid(9, 9, 540, 540, win)
     table = json.loads(args[4])
-    print("table:", table, type(table))
     board.cubes = [[Cube(table[i][j], i, j, 540, 540) for j in range(9)] for i in range(9)]
     key = None
     run = True
@@ -565,7 +561,6 @@ def loadGame(*args):
     divisorIndex = str(args[3]).find(':')
     startSeconds = int(float(args[3][0:divisorIndex]))*60 + int(float(args[3][divisorIndex+1:]))
     args += startSeconds,
-    print("load-appended:", args)
     start = time.time()
     while run:
         play_time = round(time.time() - start)
