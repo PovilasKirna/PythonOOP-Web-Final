@@ -29,9 +29,12 @@ sortImg = (5,151,240)
 #Fonts
 pygame.font.init()
 font = pygame.font.SysFont("robotoregularttf", 40)
-font_small = pygame.font.SysFont("robotoregularttf", 24)
+font_32 = pygame.font.SysFont("robotoregularttf", 32)
+font_24 = pygame.font.SysFont("robotoregularttf", 24)
+font_20 = pygame.font.SysFont("robotoregularttf", 20)
 
 #images
+arrowDown = pygame.image.load("icons/arrowDown.png")
 playImg = pygame.image.load("icons/play.png")
 trashImg = pygame.image.load("icons/trash.png")
 sortImg = pygame.image.load("icons/sort.png")
@@ -53,7 +56,7 @@ class Widgets():
         self.window.blit(TextSurf, TextRect)
         
     def small_text(self, text, x, y):
-        TextSurf, TextRect = self.text_objects(text, font_small, black)
+        TextSurf, TextRect = self.text_objects(text, font_24, black)
         TextRect.center = ((x), (y))
         self.window.blit(TextSurf, TextRect)
         
@@ -180,6 +183,8 @@ class Window():
         self.sortByAlpha = 0
         self.sortByNumeric = 0
         self.sortByAmount = 0
+        self.difficulty = "Easy"
+        self.dropDown = False
         self.W = Widgets(self.window)
         self.redrawWindow(startingpage)
         
@@ -198,6 +203,8 @@ class Window():
                 self.drawTable()
             elif (pageName == "MainMenu"):
                 self.drawMenu()
+            elif (pageName == "Difficulty"):
+                self.drawChooseDifficulty()
             elif (pageName == "CreateAccount"):
                 self.drawCreateUsername()
             elif (pageName == "ErrorPage"):
@@ -254,7 +261,7 @@ class Window():
                 self.W.text("Failed to create user", display_width/2, 680)
             self.W.button("Continue", font, 417, 510, 200, 60, ButtonPrimaryColor, ButtonHighlightColor, self.submit)
             self.W.button("Cancel", font, 663, 510, 200, 60, ButtonPrimaryColor, ButtonHighlightColor, self.quitWindow)
-            self.W.button("Don't have an account? Create one", font_small, 417, 590, 446, 60, ButtonPrimaryColor, ButtonHighlightColor, self.createAccount)
+            self.W.button("Don't have an account? Create one", font_24, 417, 590, 446, 60, ButtonPrimaryColor, ButtonHighlightColor, self.createAccount)
             pygame.display.update()
             self.clock.tick(60)
         return Input.get_text()
@@ -324,8 +331,8 @@ class Window():
         self.window.fill(white)
         self.W.text("Load Game", display_width/2, 115)
         self.W.small_text(self.username, 1200, 25)
-        self.W.button("Log Out", font_small, 1130, 45, 140, 35, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("Login"))
-        self.W.button("Back", font_small, 15, 10, 140, 35, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("MainMenu"))
+        self.W.button("Log Out", font_24, 1130, 45, 140, 35, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("Login"))
+        self.W.button("Back", font_24, 15, 10, 140, 35, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("MainMenu"))
         self.W.button("", font, 259, 164, 382, 30, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.sort("Alpha"))
         self.W.button("", font, 650, 164, 111, 30, ButtonPrimaryColor, ButtonHighlightColor,  lambda: self.sort("Amount"))
         self.W.button("", font, 771, 164, 111, 30, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.sort("Numeric"))
@@ -358,13 +365,73 @@ class Window():
             return List.getGames("Unsorted")
         except:
             self.redrawWindow("ErrorPage")
-        
+    
+    def drawChooseDifficulty(self):
+        chooseDifficulty = True
+        print("1")
+        Input = pi.TextInput()
+        print("2")
+        emptycells = None
+        difficultyList = ["Easy", "Medium", "Difficult", "Extremely difficult", "Custom"]
+        print("3")
+        while chooseDifficulty:
+            print("4")
+            self.window.fill(white)
+            print("5")
+            self.W.small_text(self.username, 1200, 25)  
+            print("6")
+            self.W.button("Log Out", font_24, 1130, 45, 140, 35, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("Login"))  
+            print("7")
+            self.W.button("Back", font_24, 15, 10, 140, 35, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("MainMenu"))
+            print("8")
+            self.W.text("Choose Difficulty", display_width/2, 115)
+            print("9")
+            if self.difficulty != "Extremely difficult":
+                print("10")
+                self.W.button(self.difficulty, font, 490, 165, 300, 60, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.toggleDropDown())
+                print("11")
+            else:
+                self.W.button(self.difficulty, font_32, 490, 165, 300, 60, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.toggleDropDown())
+                print("12")
+            self.window.blit(arrowDown, (757, 188))
+            print("13") 
+            
+            if self.difficulty == "Custom":
+                print("14")
+                events = pygame.event.get()
+                print("15")
+                for event in events:
+                    if event.type == pygame.QUIT:
+                        pygame.display.quit()
+                        quit()
+                Input.update(events)
+                self.W.button("", font_32, 490, 235, 300, 60, ButtonHighlightColor, ButtonHighlightColor)
+                self.W.textAllignLeft("Empty cells:", 524, 284)
+                self.window.blit(Input.get_surface(), (608, 246))
+                emptycells = int(Input.get_text())
+                
+            
+            if self.dropDown:
+                print("16")
+                for diff in range (5):
+                    if diff == self.difficulty:
+                        self.W.button(difficultyList[diff], font_32, 490, (235+60*diff), 300, 60, ButtonHighlightColor, ButtonHighlightColor, lambda: self.toggleDropDown(difficultyList[diff]))
+                    else:
+                        self.W.button(difficultyList[diff], font_32, 490, (235+60*diff), 300, 60, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.toggleDropDown(difficultyList[diff]))
+            print("17")
+            self.W.button("Play", font, 490, 545, 300, 60, ButtonPrimaryColor, ButtonHighlightColor, self.startGame)
+            print("18")
+            pygame.display.update()
+            print("19")
+            self.clock.tick(60)
+            print("20")
+    
     def drawMenu(self):
         self.window.fill(white)
         self.W.text("Main Menu", display_width/2, 115)
         self.W.small_text(self.username, 1200, 25)
-        self.W.button("Log Out", font_small, 1130, 45, 140, 35, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("Login"))
-        self.W.button("New Game", font, 490, 202, 300, 60, ButtonPrimaryColor, ButtonHighlightColor, self.startGame)
+        self.W.button("Log Out", font_24, 1130, 45, 140, 35, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("Login"))
+        self.W.button("New Game", font, 490, 202, 300, 60, ButtonPrimaryColor, ButtonHighlightColor, self.startGame)#lambda: self.redrawWindow("Difficulty"))
         self.W.button("Load Game", font, 490, 303, 300, 60, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("LoadGame"))
         self.W.button("Quit", font, 490, 404, 300, 60, ButtonPrimaryColor, ButtonHighlightColor, self.quitWindow)
 
@@ -379,6 +446,15 @@ class Window():
         elif not self.Username and self.Password:
             self.Username = True
             self.Password = False
+
+    def toggleDropDown(self, *args):
+        if self.dropDown:
+            self.dropDown = False
+        else:
+            self.dropDown = True
+
+        if args:
+            self.difficulty = args[0]
 
     def getUsername(self, ID):
         username = self.dbAgent.returnQueryList("SELECT Username FROM Sudoku.{} WHERE UserID = %s", (ID,))

@@ -4,13 +4,10 @@ import math
 import random
 
 class Sudoku:
-    def __init__(self, N, K):
+    def __init__(self, XnY, emptyCells):
 
-        # N - number of columns/rows
-        # K - number of missing digits
-
-        self.N = N
-        self.K = K
+        self.XnY = XnY
+        self.emptyCells = emptyCells
         self.numberList = [1,2,3,4,5,6,7,8,9]
         
         # create a desired size board
@@ -30,8 +27,8 @@ class Sudoku:
 
     # A function to check if the board is full
     def checkGrid(self):
-        for row in range(0, self.N):
-            for col in range(0, self.N):
+        for row in range(0, self.XnY):
+            for col in range(0, self.XnY):
                 if self.Board[row][col] == 0:
                     return False
         # We have a complete board!
@@ -136,10 +133,10 @@ class Sudoku:
         
     # Remove the K no. of digits to complete game 
     def removeKDigits(self):
-        count = self.K 
+        count = self.emptyCells 
         while (count != 0): 
             cellId = random.randint(0, 81)-1
-            row = int(cellId/self.N)
+            row = int(cellId/self.XnY)
             col = int(cellId%9)
             if (self.Board[row][col] != 0):
                 count -= 1
@@ -147,10 +144,10 @@ class Sudoku:
 
 
     def printSudoku(self):
-        for row in range(self.N):
+        for row in range(self.XnY):
             if row % 3 == 0 and row != 0:
                 print("- - - - - - - - - - - -")
-            for col in range(self.N):
+            for col in range(self.XnY):
                 if col % 3 == 0 and col!=0:
                     print(" | ", end="")
                 if col == 8:
@@ -163,7 +160,7 @@ class Sudoku:
     
 
 if __name__ == "__main__":
-    N = 9
-    K = 43
-    sudoku = Sudoku(N, K)
+    XnY = 9
+    emptyCells = 43
+    sudoku = Sudoku(XnY, emptyCells)
     sudoku.printSudoku()
