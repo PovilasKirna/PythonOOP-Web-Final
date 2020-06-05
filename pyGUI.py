@@ -187,7 +187,7 @@ class Window():
         self.dropDown = False
         self.W = Widgets(self.window)
         self.redrawWindow(startingpage)
-        
+    
     def redrawWindow(self, pageName):
         while run:
             events = pygame.event.get()
@@ -209,6 +209,8 @@ class Window():
                 self.drawCreateUsername()
             elif (pageName == "ErrorPage"):
                 self.drawErrorPage()
+            elif (pageName == "About"):
+                self.drawAbout()
             
             pygame.display.update()
             self.clock.tick(60)
@@ -340,7 +342,34 @@ class Window():
         Games = self.getList()
         for i in range(len(Games)):
             Row(self.window, i, self.playerID, Games[i])
-                    
+  
+    def drawAbout(self):
+        self.window.fill(white)
+        self.W.text("About", display_width/2, 115)
+        self.W.small_text(self.username, 1200, 25)
+        self.W.button("Log Out", font_24, 1130, 45, 140, 35, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("Login"))
+        self.W.button("Back", font_24, 15, 10, 140, 35, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("MainMenu"))
+        self.W.small_text("Application:", 206, 140)
+        self.W.small_text("Sudoku game with GUI:", 368, 140)
+        self.W.small_text("Author:", 235, 178)
+        self.W.small_text("Povilas Kirna:", 368, 178)
+        self.W.small_text("How to use:", 206, 216)
+        self.W.small_text(
+        """1. Log in with your username. If you do not have one create it by \n
+        pressing the button provided in the first screen after a successful \n
+        application start.\n
+        2. Choose a menu option. \n
+        3. Depending on an option there are different possible options. \n
+        3.1 Start game: Play the game by sketching in the numbers, \n
+        confirm them by pressing enter, delete - backspace. Press “Solve”\n
+        to solve automatically, “Save & Quit” to save and quit. \n
+        3.2 Load game: Play the game by pressing the green play button, \n
+        delete the game by pressing red delete button, sort by pressing \n
+        buttons above. \n
+        4. Save the game by adding the title of the game. If the title matches \n
+        an already existing one, an option to rewrite progress is provided.
+        """, 368, 216)
+        
     def getList(self):
         try:
             if type(self.playerID) != int:
@@ -433,7 +462,8 @@ class Window():
         self.W.button("Log Out", font_24, 1130, 45, 140, 35, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("Login"))
         self.W.button("New Game", font, 490, 202, 300, 60, ButtonPrimaryColor, ButtonHighlightColor, self.startGame)#lambda: self.redrawWindow("Difficulty"))
         self.W.button("Load Game", font, 490, 303, 300, 60, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("LoadGame"))
-        self.W.button("Quit", font, 490, 404, 300, 60, ButtonPrimaryColor, ButtonHighlightColor, self.quitWindow)
+        self.W.button("About", font, 490, 404, 300, 60, ButtonPrimaryColor, ButtonHighlightColor, lambda: self.redrawWindow("About"))
+        self.W.button("Quit", font, 490, 505, 300, 60, ButtonPrimaryColor, ButtonHighlightColor, self.quitWindow)
 
     def startGame(self):
         pygame.display.quit()
